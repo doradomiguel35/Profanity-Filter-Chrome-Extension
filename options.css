@@ -1,0 +1,58 @@
+div.tab {
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+  text-align: center;
+}
+
+div.tab span.tablinks {
+  display: inline-block;
+  cursor: pointer;
+  padding: 10px 55px 10px 55px;
+  transition: 0.3s;
+  font-size: 16px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(215, 215, 215);
+  border-image: initial;
+  border-radius: 4px;
+  min-width: 65px;
+  text-align: center;
+}
+
+div.tab span:hover {
+  background-color: rgb(195, 195, 195);
+}
+
+div.tab span.active {
+  background-color: rgb(179, 179, 179);
+}
+
+.tabcontent {
+  min-height: 370px;
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-top: none;
+}
+
+.tabcontent p {
+  margin: 0;
+}
+
+.visible {
+  display: block;
+}
+
+#options {
+  padding: 0px;
+}
+
+.options {
+  margin: 0px;
+}
+
+.tabcontent p {
+  margin: 0;
+}
