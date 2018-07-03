@@ -1,4 +1,5 @@
 console.log("UnseeIt V1.0 Ready");
+
 var defaultWords = ['ass','asses','asshole',
 					'bastard','bitch','blowjob',
 					'cunt','clitoris','creampie','cum',
@@ -30,8 +31,8 @@ for (var k = 0; k < defaultWords.length; k++) {
 					
 					var text = node.nodeValue;
 					// console.log(node.nodeValue);
-
-					var replacedText = text.replace(defaultWords[k], '****');
+					var lowerCasetxt = text.toLowerCase();
+					var replacedText = lowerCasetxt.replace(defaultWords[k], '****');
 					
 					// console.log(replacedText);
 					if (replacedText != text) {
@@ -43,6 +44,6 @@ for (var k = 0; k < defaultWords.length; k++) {
 			
 		}
 	}
+	console.log(replacedText.toString());
 }
-
 console.log(profanityCount);
