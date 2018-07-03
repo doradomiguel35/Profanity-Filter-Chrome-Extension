@@ -8,7 +8,7 @@ var defaultWords = ['ass','asses','asshole',
 					'handjob',
 					'motherfucker',
 					'orgy',
-					'piss','pissed',
+					'piss','pissed','pissing',
 					'slut','shit','son of a bitch',
 					'tits',
 					'whore'];
