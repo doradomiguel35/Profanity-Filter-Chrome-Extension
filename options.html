@@ -14,41 +14,59 @@
 		  </nav>
 		</div>
 
-	<div id="Settings" class="tabcontent visible">
-		<h4>Filter Method</h4>
-		<select id="filterMethodSelect"></select>
+		 <!-- Settings Tab -->
+		<div id="Settings" class="tabcontent visible">
+			<h4>Filter Method</h4>
+			<select id="filterMethodSelect">
+				<option value="censor">Censor</option>
+				<option value="substitute">Substitute</option>
+				<option value="remove">Remove</option>
+			</select>
 
-		<div id="optionsCensor" class="moveDown hidden">
-		    <h4>Censor Settings</h4>
-		    <label>
-		      <input type="checkbox" id="preserveFirst">
-		      Preserve the first letter
-		      <span class="notes">(Dog: dog = d**)</span>
-		    </label>
-		    <br />
-		    <label>
-		      <input type="checkbox" id="preserveLast">
-		      Preserve the last letter
-		      <span class="notes">(Dog: dog = **g)</span>
-		    </label>
-		    <br/>
-		    <br>
-		    <label>
-		      Censor character:
-		      <select id="censorCharacterSelect" class="small">
-		        <option value="*">*</option>
-		        <option value="&">&amp;</option>
-		        <option value="$">$</option>
-		        <option value="#">#</option>
-		        <option value="@">@</option>
-		        <option value="^">^</option>
-		        <option value="-">-</option>
-		        <option value="_">_</option>
-		      </select>
-		    </label>	
+			<div id="optionsCensor" class="moveDown hidden">
+			    <h4>Censor Settings</h4>
+			    <label>
+			      <input type="checkbox" id="preserveFirst">
+			      Preserve the first letter
+			      <span class="notes">(Dog: dog = d**)</span>
+			    </label>
+			    <br />
+			    <label>
+			      <input type="checkbox" id="preserveLast">
+			      Preserve the last letter
+			      <span class="notes">(Dog: dog = **g)</span>
+			    </label>
+			    <br/>
+			    <br>
+			    <label>
+			      Censor character:
+			      <select id="censorCharacterSelect" class="small">
+			        <option value="*">*</option>
+			        <option value="&">&amp;</option>
+			        <option value="$">$</option>
+			        <option value="#">#</option>
+			        <option value="@">@</option>
+			        <option value="^">^</option>
+			        <option value="-">-</option>
+			        <option value="_">_</option>
+			      </select>
+			    </label>	
+			</div>
 		</div>
+	
+		<!-- Ranks Tab -->
+		<div id="Ranks" class="tabcontent hidden">
+		  <h4>Disabled Domains</h4>
+		  <select id="domainSelect"></select>
+		  <button id="domainRemove">Remove</button>
+		  <div class="moveDown">
+		    <div id="domainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
+		    <input type="text" id="domainText" name="domainText" pattern="^[a-zA-Z0-9\.\-]+$">
+		    <button id="domainAdd">Add</button>
+		  </div>
+		</div>
+		
 	</div>
-
-	<script type="text/javascript" src="options.js"></script>
+<script type="text/javascript" src="options.js"></script>
 </body>
 </html>
