@@ -2,8 +2,8 @@ console.log("UnseeIt V1.0 Ready");
 
 var defaultWords = ['ass','asses','asshole',
 					'bastard','bitch','blowjob',
-					'cunt','clitoris','creampie','cum',
-					'damn','dick','douche','douchebag','deepthroat',
+					'cunt','creampie','cum',
+					'damn','dick','douchebag','deepthroat',
 					'fuck','fvck',
 					'handjob',
 					'motherfucker',
@@ -26,24 +26,21 @@ for (var k = 0; k < defaultWords.length; k++) {
 		
 		for (var j = 0; j < element.childNodes.length; j++) {
 			var node = element.childNodes[j];
+				
+			if (node.nodeType === 3) {
+				var text = node.nodeValue;
+				// console.log(text.search(defaultWords[k]))
+				// if(defaultWords[k] === text.search(defaultWords[k])){
+				var replacedText = text.toLowerCase().replace(defaultWords[k], '****');
+				// if (replacedText != text) {
+
+				element.replaceChild(document.createTextNode(replacedText), node);
+				profanityCount++;
+			// }
+				
 			
-				if (node.nodeType === 3) {
-					
-					var text = node.nodeValue;
-					// console.log(node.nodeValue);
-					var lowerCasetxt = text.toLowerCase();
-					var replacedText = lowerCasetxt.replace(defaultWords[k], '****');
-					
-					// console.log(replacedText);
-					if (replacedText != text) {
-						element.replaceChild(document.createTextNode(replacedText), node);
-						profanityCount++;
-					}
-					
-				}
-			
+			}
 		}
-	}
-	console.log(replacedText.toString());
+	}	
 }
 console.log(profanityCount);
