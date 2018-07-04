@@ -1,6 +1,8 @@
 console.log("UnseeIt V1.0 Ready");
 
-var defaultWords = ['ass','asses','asshole',
+var defaultWords = ['ass','asses','asshole','assshit','ass-hat',
+					'assbag','assbite','asscock','assfuck','asshead',
+					'asslick','asslicker','assmonkey','assmunch','asssucker',
 					'bastard','bitch','blowjob',
 					'cunt','creampie','cum',
 					'damn','dick','douchebag','deepthroat',
@@ -8,7 +10,7 @@ var defaultWords = ['ass','asses','asshole',
 					'handjob',
 					'motherfucker',
 					'orgy',
-					'piss','pissed',
+					'piss','pissed','pissing',
 					'slut','shit','son of a bitch',
 					'tits',
 					'whore'];
