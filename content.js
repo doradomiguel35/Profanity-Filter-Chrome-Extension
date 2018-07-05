@@ -43,10 +43,9 @@ function filteredWords(){
 				
 				if (node.nodeType === 3) {
 					var text = node.nodeValue;
-					var wordRegex = new RegExp("\\b"+defaultWords[k]+"\\b","i");
+					var wordRegex = new RegExp("\\b"+defaultWords[k]+"\\b" || "\\b\\s"+defaultWords[k]+"\\b\\s","i");
 					
 					if(wordRegex.test(text) === true){
-						console.log(wordRegex);
 						var replacedText = text.replace(wordRegex, '****');
 						element.replaceChild(document.createTextNode(replacedText), node);
 						profanityCount++;
@@ -58,5 +57,6 @@ function filteredWords(){
 		}	
 	}
 }
+
 filteredWords();
-console.log("Number of words filtered "+profanityCount);
+console.log("Number of words filtered: "+profanityCount);
