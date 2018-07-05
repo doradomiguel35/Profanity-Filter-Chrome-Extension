@@ -3,7 +3,7 @@ console.log("UnseeIt V1.0 Ready");
 var defaultWords = ['ass','asses','asshole','assshit','ass-hat',
 					'assbag','assbite','asscock','assfuck','asshead',
 					'asslick','asslicker','assmonkey','assmunch','asssucker',
-					'bastard','bitch','blowjob','bampot','bitchass','bitchy','bullshit',
+					'bastard','blowjob','bampot','bitchass','bitchy','bullshit',
 					'cunt','clitoris','creampie','cum','clitface',
 					'clusterfuck','cockass','cockbite','cockburger','cockface',
 					'cockhead','cockmonkey','cocknose','cocknugget','cockshit',
@@ -23,8 +23,7 @@ var defaultWords = ['ass','asses','asshole','assshit','ass-hat',
 					'motherfucker',
 					'orgy',
 					'piss','pissed','pissing',
-					'slut','shit',
-					'tits',
+					'shit',
 					'whore'];
 
 var innerBody = document.getElementsByTagName("*");
@@ -32,7 +31,7 @@ var profanityCount = 0;
 var wordSplit = [];
 var word = defaultWords[0];
 
-function filteredWords(){
+function filterWords(){
 	for (var k = 0; k < defaultWords.length; k++) {
 		var words = defaultWords[k];
 		for (var i = 0; i < innerBody.length; i++) {
