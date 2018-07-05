@@ -29,28 +29,34 @@ var defaultWords = ['ass','asses','asshole','assshit','ass-hat',
 
 var innerBody = document.getElementsByTagName("*");
 var profanityCount = 0;
-
+var wordSplit = [];
 var word = defaultWords[0];
 
-
-for (var k = 0; k < defaultWords.length; k++) {
-	var words = defaultWords[k];
-	for (var i = 0; i < innerBody.length; i++) {
-		var element = innerBody[i];
-		
-		for (var j = 0; j < element.childNodes.length; j++) {
-			var node = element.childNodes[j];
+function filteredWords(){
+	for (var k = 0; k < defaultWords.length; k++) {
+		var words = defaultWords[k];
+		for (var i = 0; i < innerBody.length; i++) {
+			var element = innerBody[i];
 			
-			if (node.nodeType === 3) {
-				var text = node.nodeValue;
-				var wordRegex = new RegExp(defaultWords[k],"i");
-				var replacedText = text.replace(wordRegex, '****');
-				element.replaceChild(document.createTextNode(replacedText), node);
-				profanityCount++;
+			for (var j = 0; j < element.childNodes.length; j++) {
+				var node = element.childNodes[j];
+				
+				if (node.nodeType === 3) {
+					var text = node.nodeValue;
+					var wordRegex = new RegExp("\\b"+defaultWords[k]+"\\b","i");
+					
+					if(wordRegex.test(text) === true){
+						console.log(wordRegex);
+						var replacedText = text.replace(wordRegex, '****');
+						element.replaceChild(document.createTextNode(replacedText), node);
+						profanityCount++;
+					}
+				}
+				
+				
 			}
-			
-			
-		}
-	}	
+		}	
+	}
 }
-console.log(profanityCount);
+filteredWords();
+console.log("Number of words filtered "+profanityCount);
