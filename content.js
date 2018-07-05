@@ -43,7 +43,7 @@ function filteredWords(){
 				
 				if (node.nodeType === 3) {
 					var text = node.nodeValue;
-					var wordRegex = new RegExp("\\b"+defaultWords[k]+"\\b" || "\\b\\s"+defaultWords[k]+"\\b\\s","i");
+					var wordRegex = new RegExp("\\b"+defaultWords[k]+"\\b" ,"gi");
 					
 					if(wordRegex.test(text) === true){
 						var replacedText = text.replace(wordRegex, '****');
