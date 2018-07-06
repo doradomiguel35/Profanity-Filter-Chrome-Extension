@@ -3,7 +3,6 @@ console.log("UnseeIt V1.0 Ready");
 var defaultWords = ['ass','asses','asshole','assshit','ass-hat',
 					'assbag','assbite','asscock','assfuck','asshead',
 					'asslick','asslicker','assmonkey','assmunch','asssucker',
-<<<<<<< HEAD
 					'bastard','bitch','blowjob','bampot','bitchass',
 					'bitchy','bullshit',
 					'cunt','clitoris','creampie','cum','clitface',
@@ -16,20 +15,15 @@ var defaultWords = ['ass','asses','asshole','assshit','ass-hat',
 					'dickjuice','dickmilk','dicksucker','dickwad','dickweasel',
 					'dickweed','dickwod','dipshit','doochbag','douchefag',
 					'dumass','dumb ass','dumbass','dumbfuck','dumbshit','dumshit',
-					'fagfucker','fuck','fvck','fuckass',
-=======
-					'bastard','bitch','blowjob',
-					'cunt','creampie','cum',
-					'damn','dick','douchebag','deepthroat',
-					'fuck','fvck',
->>>>>>> 028b43b2f04ab00dec7cd538c2e50b75107f9731
-					'handjob',
-					'motherfucker',
-					'orgy',
-					'piss','pissed','pissing',
-					'slut','shit','son of a bitch',
-					'tits',
-					'whore'];
+					'fagfucker','fuck','fvck','fuckass','fuckbag',
+					'fuckboy','fuckgirl','fuckbrain','fuckbutter','fucked',
+					'fucker','fuckersucker','fuckface','fuckhole','fuckin',
+					'fucking','fucknut','fucknutt','fucks','fuckstick',
+					'fucktard','fuckup','fuckwad','fuckwit','fuckwitt',
+					'gayfuck','gayfuckist','goddamnit',
+					'jackass','jagoff','jerkass',
+					'lameass',
+					'motherfucka','motherfucker',];
 
 var innerBody = document.getElementsByTagName("*");
 var profanityCount = 0;
