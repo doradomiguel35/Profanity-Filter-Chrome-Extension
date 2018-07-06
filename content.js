@@ -1,5 +1,6 @@
 console.log("UnseeIt V1.0 Ready");
 
+
 var defaultWords = ["asses","asshole","assshit","ass-hat",,"asssucker",
 					"assbag","assbite","asscock","assfuck","asshead",
 					"asslick","asslicker","assmonkey","assmunch","ass",
