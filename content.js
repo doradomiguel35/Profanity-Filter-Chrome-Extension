@@ -21,28 +21,25 @@ var defaultWords = ["asses","asshole","assshit","ass-hat",,"asssucker",
 					"motherfucker",
 					"orgy",
 					"piss","pissed","pissing",
-					"shite","shit",
+					"shite","shit", 		
 					"whore"];
 
 var innerBody = document.getElementsByTagName("*");
 var profanityCount = 0;
 var wordSplit = [];
 var word = defaultWords[0];
-var filterMethod = 2; 
+var filterMethod = 0; 
 
 function filterWords(){
 	for (var k = 0; k < defaultWords.length; k++) {
 		var words = defaultWords[k];
 		for (var i = 0; i < innerBody.length; i++) {
-			var element = innerBody[i];
-			
+		  var element = innerBody[i];
 			for (var j = 0; j < element.childNodes.length; j++) {
 				var node = element.childNodes[j];
-				
 				if (node.nodeType === 3) {
 					var text = node.nodeValue;
 					var wordRegex = new RegExp("\\b"+defaultWords[k]+"\\b","gi");
-			
 					switch(filterMethod){		
 						case 0://Censor
 							if(wordRegex.test(text) === true){
@@ -51,10 +48,8 @@ function filterWords(){
 								profanityCount++;
 							}
 							break;
-						
 						case 1://Substitute
 							break;
-						
 						case 2://Remove 
 							if(wordRegex.test(text) === true){
 								var replacedText = text.replace(wordRegex, "");
@@ -62,15 +57,11 @@ function filterWords(){
 								profanityCount++;
 							}
 							break;
-
 					}
 				}
-				
-				
 			}
 		}	
 	}
 }
-
 filterWords();
 console.log("Number of words filtered: "+profanityCount);
