@@ -23,7 +23,7 @@ var defaultWords = ["asses","asshole","assshit","ass-hat",,"asssucker",
 					"shite","shit", 		
 					"whore"];
 
-var substituteWords = {
+var substituteWords = { // Wait for further instructions, don't touch this section yet
 	"asses":"butts","asshole":"butthole",
 	"assshit":"buttard","ass-hat":"butt-hat",
 	"asssucker":"buttsipper","assbag":"buttbag",
