@@ -1,6 +1,5 @@
 console.log("UnseeIt V1.0 Ready");
 
-var censorCharacter = "****";
 var defaultWords = [
 	"asses","asshole","assshit","ass-hat",,"asssucker",
 	"assbag","assbite","asscock","assfuck","asshead",
@@ -80,8 +79,7 @@ var substituteWords = {
 
 var innerBody = document.getElementsByTagName("*");
 var profanityCount = 0;
-var word = defaultWords[0];
-var filterMethod = 2; 
+var filterMethod = 0; 
 var matchMethod = 1;
 var censorCharacter = "****";
 var wordRegex;
@@ -98,8 +96,8 @@ function filterWords(){
 				
 				if (node.nodeType === 3) {
 					var text = node.nodeValue;
-					globalMatchMethods(matchMethod,defaultWords[k]);
-					switchFilterMethods(filterMethod,text,element,wordRegex,censorCharacter,node,profanityCount,defaultWords);
+					var wordRegexMethod = globalMatchMethods(matchMethod,defaultWords[k]);
+					switchFilterMethods(filterMethod,text,element,wordRegexMethod,censorCharacter,node,profanityCount,defaultWords);
 					
 				}
 			}
@@ -108,19 +106,22 @@ function filterWords(){
 }
 
 function globalMatchMethods(matchMethod,defaultWords){
+	var wordRegexMethod;
 	switch(matchMethod){
 		case 0://Match Word
-			wordRegex = new RegExp("\\b"+defaultWords+"\\b","gi");
+			wordRegexMethod = new RegExp("\\b"+defaultWords+"\\b",'gi');
 			break;
 		case 1://Per Word
-			// wordRegex = new RegExp("\\B"+defaultWords+"\\B","gi"); 
-			wordRegex = new RegExp(defaultWords,"gi"); 
+			// wordRegexMethod = new RegExp('(' + defaultWords + ')' + escapeRegExp(defaultWords.slice(1)),'gi'); 
+			wordRegexMethod = new RegExp('(' + defaultWords + ')','gi');
 			break;
 	}
-	return wordRegex;
+	return wordRegexMethod;
 }
 
-
+function escapeRegExp(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
 
 function switchFilterMethods(filterMethod,text,element,wordRegex,censorCharacter,node,defaultWords){
 	switch(filterMethod){		
@@ -163,8 +164,6 @@ function removeWord(text,element,wordRegex,node){
 		profanityCount++;
 	}
 }
-
-
 
 function replaceWords(text,element,wordRegex,replace,node){
 	var replacedText = text.replace(wordRegex, replace);
