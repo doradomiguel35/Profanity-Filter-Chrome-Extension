@@ -1,5 +1,6 @@
 console.log("UnseeIt V1.0 Ready");
-var filterMethod = 1; 
+
+var censorCharacter = "****";
 var defaultWords = [
 	"asses","asshole","assshit","ass-hat",,"asssucker",
 	"assbag","assbite","asscock","assfuck","asshead",
@@ -80,46 +81,90 @@ var substituteWords = {
 var innerBody = document.getElementsByTagName("*");
 var profanityCount = 0;
 var word = defaultWords[0];
+var filterMethod = 2; 
+var matchMethod = 1;
+var censorCharacter = "****";
+var wordRegex;
 
 function filterWords(){
 	for (var k = 0; k < defaultWords.length; k++) {
 		var words = defaultWords[k];
+		
 		for (var i = 0; i < innerBody.length; i++) {
 		  var element = innerBody[i];
+			
 			for (var j = 0; j < element.childNodes.length; j++) {
 				var node = element.childNodes[j];
+				
 				if (node.nodeType === 3) {
 					var text = node.nodeValue;
-					var wordRegex = new RegExp("\\b"+defaultWords[k]+"\\b","gi");
-					switch(filterMethod){		
-						case 0://Censor
-							replaceWords(text,element,wordRegex,"****",node);
-							break;
-						case 1://Substitute 
-							if(wordRegex.test(text) === true){
-								var word = text.replace(wordRegex,defaultWords[k]);
-								var res = word.match(wordRegex);
-								for(var matchedWord of res){
-									if(defaultWords[k] === matchedWord ){
-										var textReplace = text.replace(wordRegex, replaceAndSubstitute(matchedWord));
-										element.replaceChild(document.createTextNode(textReplace), node);
-										profanityCount++
-									}
-								}
-							}	
-
-							
-							break;
-						case 2://Remove 
-							replaceWords(text,element,wordRegex,"",node);
-							break;
-
-					}
+					globalMatchMethods(matchMethod,defaultWords[k]);
+					switchFilterMethods(filterMethod,text,element,wordRegex,censorCharacter,node,profanityCount,defaultWords);
+					
 				}
 			}
 		}	
 	}
 }
+
+function globalMatchMethods(matchMethod,defaultWords){
+	switch(matchMethod){
+		case 0://Match Word
+			wordRegex = new RegExp("\\b"+defaultWords+"\\b","gi");
+			break;
+		case 1://Per Word
+			// wordRegex = new RegExp("\\B"+defaultWords+"\\B","gi"); 
+			wordRegex = new RegExp(defaultWords,"gi"); 
+			break;
+	}
+	return wordRegex;
+}
+
+
+
+function switchFilterMethods(filterMethod,text,element,wordRegex,censorCharacter,node,defaultWords){
+	switch(filterMethod){		
+		case 0://Censor
+			censorWord(text,element,wordRegex,censorCharacter,node);
+			break;
+		case 1://Substitute 
+			substituteWord(text,element,wordRegex,node,defaultWords);
+			break;
+		case 2://Remove 
+			removeWord(text,element,wordRegex,node);
+			break;
+	}
+}
+
+function substituteWord(text, element, wordRegex, node, defaultWords){
+	if(wordRegex.test(text) === true){
+		var word = text.replace(wordRegex,defaultWords);
+		var res = word.match(wordRegex);
+		for(var matchedWord of res){
+			if(defaultWords === matchedWord ){
+				var textReplace = text.replace(wordRegex, replaceAndSubstitute(matchedWord));
+				element.replaceChild(document.createTextNode(textReplace), node);
+				profanityCount++;
+			}
+		}
+	}	
+}
+
+function censorWord(text,element,wordRegex,character,node) {
+	if(wordRegex.test(text) === true){
+		var replacedWord = replaceWords(text,element,wordRegex,character,node);
+		profanityCount++;
+	}
+}
+
+function removeWord(text,element,wordRegex,node){
+	if(wordRegex.test(text) === true){
+		var replaceWord = replaceWords(text,element,wordRegex,"",node);
+		profanityCount++;
+	}
+}
+
+
 
 function replaceWords(text,element,wordRegex,replace,node){
 	var replacedText = text.replace(wordRegex, replace);
@@ -127,11 +172,15 @@ function replaceWords(text,element,wordRegex,replace,node){
 }
 
 function replaceAndSubstitute(word){
-	var replace = substituteWords[word]["substitute"];
+	var replace = substituteWords[word].substitute;
 	return replace;
 }
 
-
+// chrome.runtime.onMessage.addListener(
+// 	function (request, sender, sendResponse){
+// 		if(request.message === "filter"){
+// 			filterWords();
+// 		}
+// 	});
 filterWords();
-
 console.log("Number of words filtered: "+profanityCount);
