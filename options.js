@@ -1,52 +1,30 @@
-var filterMethods = ["Censor", "Substitute", "Remove"];
-var config = {};
-
-function filterMethodSelect(event) {
-  config.filterMethod = document.getElementById('filterMethodSelect').selectedIndex;
-  saveOptions(event, config);
+function filterMethodSelect(event){
+    chrome.storage.sync.set({filterMethod: event.target.value}, function(){
+    console.log("Filter Method: "+event.target.value);
+   });
 }
 
-function activate(element) {
-  element.classList.add('active');
+function filterMethod(){
+  chrome.storage.sync.get(['filterMethod'], function(word){
+      console.log(word.filterMethod);
+  });
 }
 
-function deactivate(element) {
-  element.classList.remove('active ');
+function censorCharacterSelect(event){
+	chrome.storage.sync.set({censorCharacter: event.target.value},function(){
+		console.log("Censor Character: "+event.target.value);
+	});
 }
 
-function show(element) {
-  element.classList.remove('hidden');
-  element.classList.add('visible');
+function matchMethodSelect(event){
+	chrome.storage.sync.set({matchMethod: event.target.value},function(){
+		console.log("matchMethod: "+event.target.value);
+	});
 }
 
-function hide(element) {
-  element.classList.remove('visible');
-  element.classList.add('hidden');
-}
+// filterMethod(); 
 
-// Switching Tabs
-function openTab(event) {
-  // Don't run on current tab
-  if ( event.currentTarget.className.indexOf('active') >= 0) {
-    return false;
-  }
-
-  // Set active tab
-  oldTab = document.getElementsByClassName("tablinks active")[0];
-  deactivate(oldTab);
-  activate(event.currentTarget);
-
-  // Show active tab content
-  oldTabContent = document.getElementsByClassName("tabcontent visible")[0];
-  hide(oldTabContent);
-  newTabName = event.currentTarget.innerText;
-  show(document.getElementById(newTabName));
-}
-
-//Listeners
-tabs = document.getElementsByClassName("tablinks");
-for (i = 0; i < tabs.length; i++) {
-  tabs[i].addEventListener('click', function(e) { openTab(e); });
-}
-
+//Listeners   
+document.getElementById('matchMethodSelect').addEventListener('change',matchMethodSelect);
+document.getElementById('censorCharacterSelect').addEventListener('change',censorCharacterSelect);
 document.getElementById('filterMethodSelect').addEventListener('change', filterMethodSelect);

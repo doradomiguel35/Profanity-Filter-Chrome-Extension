@@ -1,15 +1,34 @@
-// function toggleFilter(){
-// 	chrome.tabs.query({currentWindow: true, active: true}, function (tabs){
-//     var activeTab = tabs[0];
-//     chrome.tabs.getSelected(null, function(tab) {
-// 	  var code = 'window.location.reload();';
-// 	  chrome.tabs.executeScript(tab.id, {code: code});
-// 	});
+function toggleFilter(){
+	var toggleFilterchecked = document.getElementById('toggleFilter').checked;
+	
+	if(toggleFilterchecked){
+		chrome.storage.sync.set({filterToggle: toggleFilterchecked},function(){
+			// document.getElementById('toggleFilter').checked;
+			console.log("Toggle state is "+toggleFilterchecked);
+			chrome.tabs.reload();
+		});
+	}
+	else{
+		chrome.storage.sync.set({filterToggle: toggleFilterchecked},function(){
+			// document.getElementById('toggleFilter');
+			console.log("Toggle state is "+toggleFilterchecked);
+			chrome.tabs.reload();
+		});
+	}
+}
 
-//     chrome.tabs.sendMessage(activeTab.id, {"message": "filter"});
-// 	});
-// }
-
-
-// document.getElementById('toggleFilter').addEventListener('change',)
+function checkToggle(){
+	chrome.storage.sync.get(['filterToggle'],function(result){
+		var toggle = result.filterToggle;
+		if(toggle === true){
+			 document.getElementById('toggleFilter').checked;
+		}
+		else{
+			document.getElementById('toggleFilter');
+		}
+	});
+}
+// checkToggle();
+	
+document.getElementById('toggleFilter').addEventListener('change',toggleFilter);
 document.getElementById('options').addEventListener('click', function() {chrome.runtime.openOptionsPage(); });
