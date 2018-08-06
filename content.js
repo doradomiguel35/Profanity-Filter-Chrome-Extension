@@ -4,7 +4,7 @@ var defaultWords = [
 	"asslick","asslicker","assmonkey","assmunch","ass",
 	"bastard","blowjob","bampot","bitchass","bitchy",
 	"bullshit","bitch",
-	"cunt","clitoris","creampie","cum","clitface",
+	"cunt","creampie","cum","clitface",
 	"clusterfuck","cockass","cockbite","cockburger","cockface",
 	"cockhead","cockmonkey","cocknose","cocknugget","cockshit",
 	"cockwaffle","cumbubble","cumslut","cumtart","cuntass",
@@ -84,21 +84,45 @@ var substituteWords = {
 	'ass':'[butt]','bastard':'[no father]'
 };
 
+var settings = {
+	"filterMethod": 1,
+	"censorCharacter": "*",
+	"filterToggle": true,
+	"matchMethod": 0
+};
+
 var innerBody = document.getElementsByTagName("*");
 var profanityCount = 0;
-var filterMethod = 0; 
-var matchMethod = 1;
-var censorCharacter = 8;
+var filterMethod,censorCharacter,filterToggle,matchMethod;
+var matchMethod = 0;
 var wordRegex;
 
 console.log("UnseeIt V1.0 Ready");
 // var word = defaultWords[0];
 // console.log(replaceAndSubstitute(word));
 
+function loadSettings(){
+	chrome.storage.sync.get(settings,function(settings){
+		filterMethod = settings.filterMethod;
+		censorCharacter = settings.censorCharacter;
+		filterToggle = settings.filterToggle;
+		matchMethod = settings.matchMethod;
+		console.log("Filter Method:"+filterMethod+",\n"+"Censor Character:"+censorCharacter+",\n"+"Filter Toggle:"+filterToggle+",\n"+"Match Method"+matchMethod);
+		toggleFilter();
+	});
+	
+	// console.log()
+	// chrome.storage.sync.get("censorCharacter",function(settings){
+	// 	censorCharacter = settings.censorCharacter;
+	// 	console.log(censorCharacter);
+	// });
+	
+}
+
 function filterWords(){
-	var urlname = window.location.pathname;
-	console.log(urlname);
+	console.log("function executed");
 	for (var k = 0; k < defaultWords.length; k++) {
+		// console.log("interated");
 		var words = defaultWords[k];
 		for (var i = 0; i < innerBody.length; i++) {
 		  var element = innerBody[i];
@@ -107,10 +131,7 @@ function filterWords(){
 				if (node.nodeType === 3) {
 					var text = node.nodeValue;
 					var wordRegexMethod = globalMatchMethods(matchMethod,defaultWords[k]);
-					
-					var word = defaultWords[k];
-					// console.log(word);		
-					switchFilterMethods(filterMethod,text,element,wordRegexMethod,node,profanityCount,word);
+					switchFilterMethods(filterMethod,text,element,wordRegexMethod,node,profanityCount,defaultWords[k]);
 					
 				} 
 			}
@@ -120,11 +141,13 @@ function filterWords(){
 
 function globalMatchMethods(matchMethod,defaultWords){
 	var wordRegexMethod;
+
 	switch(matchMethod){
-		case 0://Match Word
+		case "0"://Match Word
+			
 			wordRegexMethod = new RegExp("\\b"+defaultWords+"\\b",'gi');
 			break;
-		case 1://Per Word
+		case "1"://Per Word
 			wordRegexMethod = new RegExp('(' + defaultWords + ')','gi');
 			break;
 	}
@@ -133,14 +156,14 @@ function globalMatchMethods(matchMethod,defaultWords){
 
 function switchFilterMethods(filterMethod,text,element,wordRegex,node,defaultWords){
 	switch(filterMethod){		
-		case 0://Censor
+		case "0"://Censor
 			censorWord(text,element,wordRegex,node);
 			break;
-		case 1://Substitute 
+		case "1"://Substitute 
 			// console.log(defaultWords);
 			substituteWord(text,element,wordRegex,node,defaultWords);
 			break;
-		case 2://Remove 
+		case "2"://Remove 
 			removeWord(text,element,wordRegex,node);
 			break;
 	}
@@ -160,6 +183,7 @@ function substituteWord(text,element,wordRegex,node,defaultWords){
 	// 		}
 	// 	}
 	// }	
+
 	if(wordRegex.test(text) === true){
 		var substitutedWord = replaceAndSubstitute(defaultWords);
 		console.log(defaultWords);
@@ -172,31 +196,31 @@ function censorWord(text,element,wordRegex,node) {
 	if(wordRegex.test(text) === true){
 		var character;
 		switch(censorCharacter){
-			case 0:
+			case "****":
 				replaceWords(text,element,wordRegex,"****",node);
 				break;
-			case 1:
+			case "&&&&":
 				replaceWords(text,element,wordRegex,"&&&&",node);
 				break;
-			case 2:
+			case "$$$$":
 				replaceWords(text,element,wordRegex,"$$$$$$$$",node);
 				break;
-			case 3:
+			case "####":
 				replaceWords(text,element,wordRegex,"####",node);
 				break;
-			case 4:
+			case "@@@@":
 				replaceWords(text,element,wordRegex,"@@@@",node);
 				break;
-			case 5:
+			case "^^^^":
 				replaceWords(text,element,wordRegex,"^^^^",node);
 				break;
-			case 6:
+			case "----":
 				replaceWords(text,element,wordRegex,"----",node);
 				break;
-			case 7:
+			case "____":
 				replaceWords(text,element,wordRegex,"____",node);
 				break;
-			case 8:
+			case "mixed":
 				replaceWords(text,element,wordRegex,"*&$#",node);
 				break;
 		}
@@ -221,11 +245,18 @@ function replaceAndSubstitute(word){
 	return replace;
 }
 
-// chrome.runtime.onMessage.addListener(
-// 	function (request, sender, sendResponse){
-// 		if(request.message === "filter"){
-// 			filterWords();
-// 		}
-// 	});
-filterWords();
+function toggleFilter(){
+	// chrome.storage.sync.get(['filterToggle'], function (result){
+	// 	var toggle = result.filterToggle;
+	// 	console.log(toggle);
+		console.log(filterToggle);
+
+		if(filterToggle === true){
+			filterWords();
+		}
+	// });
+}
+
+loadSettings();
+// toggleFilter();
 console.log("Number of words filtered: "+profanityCount);
