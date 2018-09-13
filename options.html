@@ -55,18 +55,40 @@
 			        <option value="mixed">mixed</option>
 			      </select>
 			</div>
+			<br>
+			<button id="btnSave">Save</button>
 		</div>
 	
 		<!-- Ranks Tab -->
 		<div id="Ranks" class="tabcontent hidden">
-		  <h4>Disabled Domains</h4>
-		  <select id="domainSelect"></select>
+		  <h4>Warning Domains</h4>
+		  <select id="domainSelect">
+		  	<option>--Choose Domain--</option>
+		  	<div id="warningDomains"></div>
+		  </select>
 		  <button id="domainRemove">Remove</button>
 		  <div class="moveDown">
+		    <br>
 		    <div id="domainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
 		    <input type="text" id="domainText" name="domainText" pattern="^[a-zA-Z0-9\.\-]+$">
 		    <button id="domainAdd">Add</button>
+		    <br>
 		  </div>
+
+		  <table id="siteAndCount">
+		  	<thead>
+			  	<tr>
+			  		<th>Website</th>
+			  		<th>Profanity Count</th>
+			  	</tr>
+		  	</thead>
+		  	<tbody style="overflow: auto;">	
+			  	<tr>
+			  		<td><div id="site"></div></td>
+			  		<td><div id="count"></div></td>
+			  	</tr>
+		  	</tbody>
+		 </table>
 		</div>
 		
 	</div>
