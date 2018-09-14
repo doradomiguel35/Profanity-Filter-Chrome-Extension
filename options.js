@@ -163,7 +163,7 @@ function addDomain(event){
 
 		if(regexpDomain.test(stringifyDomains) === true){
 			htmlNotif ='Site already a warning domain';
-			console.log(htmlNotif);
+			console.log(htmlNotif);   
 			document.getElementById('addNotif').innerHTML = htmlNotif;
 		}
 
@@ -176,7 +176,7 @@ function addDomain(event){
 		}
 	});
 }
-
+     
 function removeDomain(event){
 	var selectDomain = document.getElementById('domainSelect').value;
 	var warningDomains;
@@ -186,11 +186,14 @@ function removeDomain(event){
 			if(selectDomain === domain.warningDomains[i]){
 				delete domain.warningDomains[i];
 				warningDomains = domain.warningDomains;
-				console.log(warningDomains);
+				warningDomains = warningDomains.filter(function(x){
+  					return (x !== (undefined || null || ''));
+  				});
+				console.log(JSON.stringify(warningDomains));
 				chrome.storage.sync.set({warningDomains},function(){
 					htmlNotif = "Warning domain removed";
 					document.getElementById('notifRemove').innerHTML = htmlNotif;
-				});
+				}); 
 			}
 
 			else{
