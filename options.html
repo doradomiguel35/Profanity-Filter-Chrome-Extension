@@ -64,21 +64,23 @@
 		  <h4>Warning Domains</h4>
 		  <select id="domainSelect">
 		  	<option>--Choose Domain--</option>
-		  	<div id="warningDomains"></div>
 		  </select>
 		  <button id="domainRemove">Remove</button>
 		  <div class="moveDown">
+		  	<div id="notifRemove"></div>
 		    <br>
-		    <div id="domainNote" class="notes">Example: "google.com" or "mail.google.com"</div>
+			<div id="domainNote" class="notes">Note: To avoid the extension from not recognizing the site as a warning domain, copy and paste the link found under the ranked websites <br><br>	
+		    Example: "https://www.google.com" or "https://www.mail.google.com"</div>
 		    <input type="text" id="domainText" name="domainText" pattern="^[a-zA-Z0-9\.\-]+$">
 		    <button id="domainAdd">Add</button>
+		    <div id="addNotif"></div>
 		    <br>
 		  </div>
 
 		  <table id="siteAndCount">
 		  	<thead>
 			  	<tr>
-			  		<th>Website</th>
+			  		<th width="500">Website</th>
 			  		<th>Profanity Count</th>
 			  	</tr>
 		  	</thead>
