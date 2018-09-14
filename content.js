@@ -78,6 +78,7 @@ console.log("UnseeIt V1.0 Ready");
 // console.log(replaceAndSubstitute(word));
 
 function loadSettings(){
+	
 	var websites= [];
 	chrome.storage.sync.get(settings,function(settings){
 		filterMethod = settings.filterMethod;
@@ -160,6 +161,18 @@ function addWebStatistics(site, profanityCount){
 			websites.push({"site":site, "count":profanityCount.toString()});
 			console.log(websites);
 		});
+	});
+}
+
+function checkWarningDomain(){
+	var origin_site = document.location.origin;
+	chrome.storage.sync.get(['warningDomains'],function(result){
+		for(var i = 0; i < result.warningDomains.length; i++){
+			if(origin_site === result.warningDomains[i]){
+				console.log("Warning");
+				alert("Warning: You are about to visit a website that contains a lot of profanity");
+			}
+		}
 	});
 }
 
@@ -256,5 +269,7 @@ function toggleFilter(){
 	}
 }
 
+// if(window.confirm("You are about to enter a website that contains a lot of profanity")){}
+checkWarningDomain();
 loadSettings();
-
+// }                  
