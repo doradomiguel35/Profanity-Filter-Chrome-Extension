@@ -51,24 +51,41 @@ function retrieveSettings(){
 		}
 	});
 	sortSites();
-	populateTable();
+	// populateTable();
 	populateWarningDomains();
+	
 }
 
 function sortSites(){
 	chrome.storage.sync.get(['websites'],function(result){
+		var sort_by = function(field, reverse, primer){
+		var key = primer ? 
+	       function(x) {return primer(x[field])} : 
+	       function(x) {return x[field]};
+			reverse = !reverse ? 1 : -1;
+			return function (a, b) {
+		       return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+		     } 
+		}
 		var unsorted = result.websites;
-		unsorted.sort(function(obj1,obj2){
-			return obj1.count < obj2.count;
-		});
-		console.log(unsorted);
+		var websites = unsorted.sort(sort_by('count', true, parseInt));
+		chrome.storage.sync.set({websites},function(){
+			console.log("Sites sorted");
+		});	
 	});
+	populateTable();
 }
 
 function populateTable(){
 	chrome.storage.sync.get(['websites'],function(result){
+		var counter = 0;
+		var tr = document.createElement('tr');
+		var td = document.createElement('td');
+		var td2 = document.createElement('td');
+		var table = document.getElementById('siteAndCount');
 		for(var i = 0 ; i < result.websites.length ; i++){
-			htmlSite+= result.websites[i].site+'<br><br>';
+			counter++;
+			htmlSite+= counter+". "+result.websites[i].site+'<br><br>';
 			htmlCount+= result.websites[i].count+'<br><br>';
 			htmlSite = htmlSite.replace("undefined","");
 			htmlCount = htmlCount.replace("undefined","");
@@ -118,7 +135,7 @@ function saveSettings(){
 		"censorCharacter": eventCensorChar,
 		"filterMethod": eventFilterMethod,
 		"matchMethod": eventMatchMethod,
-		"password": "null",
+		// "password": "null",
 		"warningDomains": [
 			"https://www.facebook.com",
 			"https://www.twitter.com",
@@ -131,19 +148,56 @@ function saveSettings(){
 	chrome.storage.sync.set(saveSettings,function(){
 		
 	});
-	alert("Settings Saved");
+	message("Settings Saved");
 }
 
-// function getDomains(){
-// 	chrome.storage.sync.get(['warningDomains'],function(domains){
-
-// 	});
-// }
-
 function addDomain(event){
-	var domain = document.getElementById('domainText');
+	var domain = document.getElementById('domainText').value;
+	var regexpDomain = new RegExp(domain);
+	var warningDomains;
+	var stringifyDomains;
+	var htmlNotif;
 	chrome.storage.sync.get('warningDomains',function(domains){
-		console.log(domains[0].value);
+		warningDomains = domains.warningDomains;
+		stringifyDomains = JSON.stringify(warningDomains);
+
+		if(regexpDomain.test(stringifyDomains) === true){
+			htmlNotif ='Site already a warning domain';
+			console.log(htmlNotif);
+			document.getElementById('addNotif').innerHTML = htmlNotif;
+		}
+
+		else{
+			warningDomains.push(domain);
+			chrome.storage.sync.set({warningDomains},function(result){
+				htmlNotif ='Warning domain added';
+				document.getElementById('addNotif').innerHTML = htmlNotif;
+			});
+		}
+	});
+}
+
+function removeDomain(event){
+	var selectDomain = document.getElementById('domainSelect').value;
+	var warningDomains;
+	var htmlNotif;
+	chrome.storage.sync.get('warningDomains',function(domain){
+		for(var i = 0;i < domain.warningDomains.length;i++){
+			if(selectDomain === domain.warningDomains[i]){
+				delete domain.warningDomains[i];
+				warningDomains = domain.warningDomains;
+				console.log(warningDomains);
+				chrome.storage.sync.set({warningDomains},function(){
+					htmlNotif = "Warning domain removed";
+					document.getElementById('notifRemove').innerHTML = htmlNotif;
+				});
+			}
+
+			else{
+				htmlNotif = "Warning domain non existent";
+				document.getElementById('notifRemove').innerHTML = htmlNotif;
+			}
+		}
 	});
 }
 
@@ -190,8 +244,7 @@ for (var i = 0; i < tabs.length; i++) {
 retrieveSettings();
 
 //Listeners   
-// document.getElementById('domainSelect').addEventListener('change',getDomains);
-// document.getElementById('domainSelect').addEventListener('click',populateTable);
+document.getElementById('domainRemove').addEventListener('click',removeDomain);
 document.getElementById('domainAdd').addEventListener('click',addDomain);
 document.getElementById('btnSave').addEventListener('click',saveSettings);
 document.getElementById('matchMethodSelect').addEventListener('change',matchMethodSelect);
