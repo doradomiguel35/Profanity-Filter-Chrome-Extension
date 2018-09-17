@@ -5,7 +5,7 @@ var settings = {
 	"matchMethod": 0
 };
 
-var eventCensorChar,eventMatchMethod,eventFilterMethod,htmlSite,htmlCount,htmldomain;
+var eventCensorChar,eventMatchMethod,eventFilterMethod,htmlSite,htmlCount,htmldomain,htmlWord,htmlSubstitute;
 
 function retrieveSettings(){
 	chrome.storage.sync.get(settings, function(settings){
@@ -51,6 +51,7 @@ function retrieveSettings(){
 		}
 	});
 	sortSites();
+	populatewordTable();
 	// populateTable();
 	populateWarningDomains();
 	
@@ -76,13 +77,29 @@ function sortSites(){
 	populateTable();
 }
 
+function populatewordTable(){
+	var stringifySubstitute;
+	var arraySub = [];
+	var counter = 0;
+	chrome.storage.sync.get(['substituteWords'],function(sub){
+		for(var i = 0; i < sub.substituteWords.length; i++){
+			counter++;
+			htmlWord+= counter+". "+sub.substituteWords[i].word+'<br><br>';
+			htmlSubstitute+= sub.substituteWords[i].substitute+'<br><br>';
+			htmlWord = htmlWord.replace("undefined","");
+			htmlSubstitute = htmlSubstitute.replace("undefined","");
+			document.getElementById('word').innerHTML = htmlWord;
+			document.getElementById('wordSubstitute').innerHTML = htmlSubstitute;
+		}
+		console.log("Word table populated");
+	});
+	
+}
+
+
 function populateTable(){
 	chrome.storage.sync.get(['websites'],function(result){
 		var counter = 0;
-		var tr = document.createElement('tr');
-		var td = document.createElement('td');
-		var td2 = document.createElement('td');
-		var table = document.getElementById('siteAndCount');
 		for(var i = 0 ; i < result.websites.length ; i++){
 			counter++;
 			htmlSite+= counter+". "+result.websites[i].site+'<br><br>';
@@ -135,20 +152,12 @@ function saveSettings(){
 		"censorCharacter": eventCensorChar,
 		"filterMethod": eventFilterMethod,
 		"matchMethod": eventMatchMethod,
-		// "password": "null",
-		"warningDomains": [
-			"https://www.facebook.com",
-			"https://www.twitter.com",
-			"https://www.pornhub.com",
-			"https://www.9gag.com",
-			"https://www.tumblr.com",
-		]
 	}
 
 	chrome.storage.sync.set(saveSettings,function(){
 		
 	});
-	message("Settings Saved");
+	alert	("Settings Saved");
 }
 
 function addDomain(event){
@@ -157,10 +166,9 @@ function addDomain(event){
 	var warningDomains;
 	var stringifyDomains;
 	var htmlNotif;
-	chrome.storage.sync.get('warningDomains',function(domains){
+	chrome.storage.sync.get(['warningDomains'],function(domains){
 		warningDomains = domains.warningDomains;
 		stringifyDomains = JSON.stringify(warningDomains);
-
 		if(regexpDomain.test(stringifyDomains) === true){
 			htmlNotif ='Site already a warning domain';
 			console.log(htmlNotif);   
@@ -172,6 +180,7 @@ function addDomain(event){
 			chrome.storage.sync.set({warningDomains},function(result){
 				htmlNotif ='Warning domain added';
 				document.getElementById('addNotif').innerHTML = htmlNotif;
+				chrome.tabs.reload();
 			});
 		}
 	});
@@ -181,7 +190,7 @@ function removeDomain(event){
 	var selectDomain = document.getElementById('domainSelect').value;
 	var warningDomains;
 	var htmlNotif;
-	chrome.storage.sync.get('warningDomains',function(domain){
+	chrome.storage.sync.get(['warningDomains'],function(domain){
 		for(var i = 0;i < domain.warningDomains.length;i++){
 			if(selectDomain === domain.warningDomains[i]){
 				delete domain.warningDomains[i];
@@ -193,6 +202,7 @@ function removeDomain(event){
 				chrome.storage.sync.set({warningDomains},function(){
 					htmlNotif = "Warning domain removed";
 					document.getElementById('notifRemove').innerHTML = htmlNotif;
+					chrome.tabs.reload();
 				}); 
 			}
 
@@ -201,6 +211,89 @@ function removeDomain(event){
 				document.getElementById('notifRemove').innerHTML = htmlNotif;
 			}
 		}
+	});
+}
+
+function addWord(event){
+	var word = document.getElementById('addWords').value;
+	var substitute = document.getElementById('substitute').value;
+	var regExpWord = new RegExp(word);
+	var stringifyWord;
+	var defaultWords;
+	var substituteWords;
+	var htmlNotif;
+	chrome.storage.sync.get(['defaultWords'],function(result){
+		chrome.storage.sync.get(['substituteWords'],function(sub){
+			defaultWords = result.defaultWords;
+			substituteWords = sub.substituteWords;
+
+			stringifyWord = JSON.stringify(defaultWords);
+			// console.log(stringifyWord);
+
+			if(regExpWord.test(stringifyWord) === true){
+				htmlNotif = "Word already added";
+				console.log("Word already added");
+				document.getElementById('addNotif').innerHTML = htmlNotif;
+			}
+
+			else{
+				defaultWords.push({"count": 0, "word": word});
+				substituteWords.push({"substitute": "["+substitute+"]","word": word});
+				console.log(substituteWords);
+				chrome.storage.sync.set({defaultWords},function(){
+					chrome.storage.sync.set({substituteWords},function(){
+						htmlNotif = "Word added";
+						document.getElementById('addNotif').innerHTML = htmlNotif;
+					});
+				});
+				chrome.tabs.reload();
+
+			}
+		});
+		
+	});
+}
+
+function removeWord(event){
+	var selectWord = document.getElementById('removeWord').value;
+	var defaultWords;
+	var substituteWords;
+	var htmlNotif;
+	chrome.storage.sync.get(['defaultWords'],function(result){
+		chrome.storage.sync.get(['substituteWords'],function(sub){
+			for(var i = 0; i < result.defaultWords.length; i++){
+				if(selectWord === result.defaultWords[i].word){
+					delete result.defaultWords[i];
+					defaultWords = result.defaultWords;
+					defaultWords = defaultWords.filter(function(x){
+  					return (x !== (undefined || null || ''));
+  					});
+  					
+  					for(var j = 0; j < sub.substituteWords.length; j++){
+  						if(selectWord === sub.substituteWords[j].word){
+  							delete sub.substituteWords[j];
+  							substituteWords = sub.substituteWords;
+  							substituteWords = substituteWords.filter(function(x){
+							return (x !== (undefined || null || ''));
+							});
+
+							chrome.storage.sync.set({defaultWords},function(){
+								chrome.storage.sync.set({substituteWords},function(){
+									htmlNotif = "Word removed";
+									document.getElementById('removeNotif').innerHTML = htmlNotif;
+									chrome.tabs.reload();
+								});
+							});
+  						}
+  					}
+				}
+
+				else{
+					htmlNotif = "Word does not exist";
+					document.getElementById('removeNotif').innerHTML = htmlNotif;
+				}
+  			}	
+  		});
 	});
 }
 
@@ -242,11 +335,25 @@ for (var i = 0; i < tabs.length; i++) {
   tabs[i].addEventListener('click', function(e) { openTab(e); });
 }
 
-
+// var substituteWords = [
+// 						{word: "fck", substitute: "[lve]"},
+// 						{word: "fuck", substitute: "[love]"},
+// 						{word: "fuckable", substitute: "[loveable]"},
+// 						{word: "fucked", substitute: "[loved]"},
+// 						{word: "fucker", substitute: "[lover]"},
+// 						{word: "fuckin", substitute: "[lovin]"},
+// 						{word: "fucks", substitute: "[loves]"},
+// 						{word: "fvck", substitute: "[lve]"}
+// 					];
 
 retrieveSettings();
+// chrome.storage.sync.set({substituteWords},function(){
+// 	console.log("test");
+// });
 
 //Listeners   
+document.getElementById('btnRemove').addEventListener('click',removeWord);
+document.getElementById('btnAdd').addEventListener('click',addWord);
 document.getElementById('domainRemove').addEventListener('click',removeDomain);
 document.getElementById('domainAdd').addEventListener('click',addDomain);
 document.getElementById('btnSave').addEventListener('click',saveSettings);

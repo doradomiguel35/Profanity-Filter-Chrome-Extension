@@ -30,18 +30,6 @@
 			</select>
 
 			<div id="optionsCensor" class="moveDown hidden">
-			    <!-- <h4>Censor Settings</h4>
-			    <label>
-			      <input type="checkbox" id="preserveFirst">
-			      Preserve the first letter
-			      <span class="notes">(Dog: dog = d**)</span>
-			    </label>
-			    <br />
-			    <label>
-			      <input type="checkbox" id="preserveLast">
-			      Preserve the last letter
-			      <span class="notes">(Dog: dog = **g)</span>
-			    </label> -->
 			    <h4>Censor character:</h4>
 			      <select id="censorCharacterSelect" class="small" name = "censorCharacters">
 			        <option value="****">*</option>
@@ -57,6 +45,31 @@
 			</div>
 			<br>
 			<button id="btnSave">Save</button>
+
+			<h4> Add/Remove Words </h4>
+			<input type="text" id="addWords" placeholder="Word">
+			<input type="text" id="substitute" placeholder="Word Substitute"><br>
+			<div id="addNotif"></div>
+			<button id="btnAdd">Add</button>
+			<br><br>
+			<input type="text" id="removeWord" placeholder="Word">
+			<button id="btnRemove">Remove</button><br>
+			<div id="removeNotif"></div>
+			<br>
+			<table id="wordAndSubstitute">
+				<thead>
+					<tr>
+						<th>Word</th>
+						<th>Substitute</th>
+					</tr>
+					<tbody style="overflow: auto;">
+						<tr>
+							<td><div id="word"></div></td>
+							<td><div id="wordSubstitute"></div></td>
+						</tr>
+					</tbody>
+				</thead>
+			</table>
 		</div>
 	
 		<!-- Ranks Tab -->
