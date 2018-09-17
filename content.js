@@ -12,7 +12,7 @@ var defaultWords = [
 	"cumdumpster","cuntface","cuntrag","cuntslut","cock",
 	"damn","douche","douchebag","deepthroat","dildo","dildos",
 	"dickbag","dickface","dickfuck","dickfucker","dickhead",
-	"dickjuice","dickmilk","dicksucker","dickwad","dickweasel",
+	"dickjuice","dickmilk","dicksuck er","dickwad","dickweasel",
 	"dickweed","dickwod","dipshit","doochbag","douchefag",
 	"dumass","dumb ass","dumbass","dumbfuck","dumbshit","dumshit","dick",
 	"fagfucker","fvck","fucker","fuckers","fucks","fucken","fucking","fuckass","fucked","fuck","fuckin",
@@ -35,10 +35,6 @@ var substituteWords = {
 	'assmonkey':'[buttmonkey]','assmunch':'[butmunch]',
 	'ass':'[butt]','anal':'[butt]','bastard':'[no father]',
 	'dildo':'[toy]','dildos':'[toys]',
-	'fuck':'[love]','fucks':'[loves]','fucker':'[lover]',
-	'fuckable':'[loveable]','fucked':'[loved]','fuckin':'[lovin]',
-	'fvck':'[lve]','fck':'[lve]'
-
 };
 
 var settings = {
@@ -47,38 +43,21 @@ var settings = {
 	"filterToggle": true,
 	"matchMethod": 0,
 	"password": "null",
-	"warningDomains": [
-			"https://www.facebook.com",
-			"https://www.twitter.com",
-			"https://www.9gag.com",
-			"https://www.tumblr.com",
-			"https://www.youtube.com",
-			"https://m.youtube.com"
-	],
-	"websites": [
-			{"count": "3358","site": "https://www.google.com.ph"},
-			{"count": "249","site": "https://notifications.google.com"},
-			{"count": "143","site": "https://www.youtube.com"},
-			{"count": "128","site": "https://www-urbandictionary-com.cdn.ampproject.org"},
-			{"count": "118","site": "https://stackoverflow.com"}
-		]
 };
 
 var innerBody = document.getElementsByTagName("*");
-var profanityCount = 0;
+
 var filterMethod,censorCharacter,filterToggle,matchMethod,site;
 var matchMethod = 0;
 var wordRegex;
 var stringifyObject;
 var retrieveCount;
 var regexpSite;
+var profanityCount = 0;
 
 console.log("UnseeIt V1.0 Ready");
-// var word = defaultWords[0];
-// console.log(replaceAndSubstitute(word));
 
 function loadSettings(){
-	
 	var websites= [];
 	chrome.storage.sync.get(settings,function(settings){
 		filterMethod = settings.filterMethod;
@@ -86,17 +65,17 @@ function loadSettings(){
 		filterToggle = settings.filterToggle;
 		matchMethod = settings.matchMethod;
 		var origin_site = document.location.origin;
-
-		console.log("Filter Method:"+filterMethod+",\n"+"Censor Character:"+censorCharacter+",\n"+"Filter Toggle:"+filterToggle+",\n"+"Match Method: "+matchMethod);
+		
 		toggleFilter();
-		console.log("Number of words filtered: "+profanityCount);
 		chrome.storage.sync.get(['websites'],function(result){
+			console.log("Number of words filtered: "+profanityCount);
 			stringifyObject = JSON.stringify(result.websites);
 			regexpSite = new RegExp(origin_site);
 
 			for(var i = 0;i < result.websites.length; i++){
 				site = result.websites[i].site;
 				regexpSite = new RegExp(origin_site);
+
 				//Check if site is existing 
 				if(origin_site === site){
 					console.log(origin_site);
@@ -107,10 +86,7 @@ function loadSettings(){
 							return retrieveCount.toString();
 					});
 					websites = JSON.parse(replaceObject);
-					console.log(websites);
 					chrome.storage.sync.set({websites},function(){
-						console.log("Key Overwritten");
-
 						websites.push(JSON.parse(replaceObject));
 					});
 				}
@@ -125,41 +101,42 @@ function loadSettings(){
 }
 
 function filterWords(){
-	for (var k = 0; k < defaultWords.length; k++) {
-		var words = defaultWords[k];
-		for (var i = 0; i < innerBody.length; i++) {
-		  var element = innerBody[i];
-			for (var j = 0; j < element.childNodes.length; j++) {
-				var node = element.childNodes[j];
-				if (node.nodeType === 3) {
-					var text = node.nodeValue;
-					var wordRegexMethod = globalMatchMethods(matchMethod,defaultWords[k]);
-					//Censor/Remove methods
-					if(filterMethod != "1"){ 
-						switchFilterMethods(filterMethod,text,element,wordRegexMethod,node,profanityCount,defaultWords[k]);
-					}
+	chrome.storage.sync.get(['defaultWords'],function(result){
+		for (var k = 0; k < result.defaultWords.length; k++) {
+			var words = result.defaultWords[k].word;
+			for (var i = 0; i < innerBody.length; i++) {
+			  var element = innerBody[i];
+				for (var j = 0; j < element.childNodes.length; j++) {
+					var node = element.childNodes[j];
+					if (node.nodeType === 3) {
+						var text = node.nodeValue;
+						var wordRegexMethod = globalMatchMethods(matchMethod,result.defaultWords[k].word);
+						//Censor/Remove methods
+						if(filterMethod != "1"){ 
+							switchFilterMethods(filterMethod,text,element,wordRegexMethod,node);
+						}
 
-					else{
-						//Substitute method
-						substituteWord(text,element,wordRegexMethod,node,defaultWords[k]);
-					}
-				} 
-			}
-		}	
-	}
+						else{
+							//Substitute method
+							substituteWord(text,element,wordRegexMethod,node,result.defaultWords[k].word);
+						}
+					} 
+				}
+			}	
+		}
+	});
 }
 
 function addWebStatistics(site, profanityCount){
 	var websites = [];
 	chrome.storage.sync.get(['websites'],function(result){
+		//Pushes entire object array to a new variable array
 		for(var i = 0 ; i < result.websites.length ; i++){
 				websites.push(result.websites[i]);
 		}
-		websites.push({"site":site, "count":profanityCount.toString()});
-		console.log(JSON.stringify(websites));
-		chrome.storage.sync.set({websites},function(){
+		websites.push({"site":site, "count":profanityCount.toString()}); // Push new object to array
+		chrome.storage.sync.set({websites},function(){ // 
 			websites.push({"site":site, "count":profanityCount.toString()});
-			console.log(websites);
 		});
 	});
 }
@@ -168,9 +145,8 @@ function checkWarningDomain(){
 	var origin_site = document.location.origin;
 	chrome.storage.sync.get(['warningDomains'],function(result){
 		for(var i = 0; i < result.warningDomains.length; i++){
-			if(origin_site === result.warningDomains[i]){
-				console.log("Warning");
-				alert("Warning: You are about to visit a website that contains a lot of profanity");
+			if(origin_site === result.warningDomains[i]){ // Check if site is a Warning domain
+				alert("Warning: This website contains a lot of profanity");
 			}
 		}
 	});
@@ -189,7 +165,7 @@ function globalMatchMethods(matchMethod,defaultWords){
 	return wordRegexMethod;
 }
 
-function switchFilterMethods(filterMethod,text,element,wordRegex,node,defaultWords){
+function switchFilterMethods(filterMethod,text,element,wordRegex,node){
 	switch(filterMethod){		
 		case "0"://Censor
 			censorWord(text,element,wordRegex,node);
@@ -202,16 +178,37 @@ function switchFilterMethods(filterMethod,text,element,wordRegex,node,defaultWor
 
 //Substitute Method
 function substituteWord(text,element,wordRegex,node,defaultWords){
-	if(wordRegex.test(text) === true){
-		var substitutedWord = substituteWords[defaultWords];
-		replaceWords(text,element,wordRegex,substitutedWord,node);
-	}
+	chrome.storage.sync.get(['substituteWords'],function(result){
+		if(wordRegex.test(text) === true){
+			for(var i = 0; i < result.substituteWords.length; i++){
+				var objectWord = result.substituteWords[i].word;
+				var substitutedWord = result.substituteWords[i].substitute;
+				if(objectWord === defaultWords){
+					replaceWords(text,element,wordRegex,substitutedWord,node);
+				}
+			}
+		}
+	});
 }
 
 //Censor Method
 function censorWord(text,element,wordRegex,node) {
 	if(wordRegex.test(text) === true){
-		var character;
+
+		// chrome.storage.sync.get(['defaultWords'],function(result){
+			
+			
+		// 	for(var i = 0; i < result.defaultWords.length; i++){
+		// 		if(wordRegex.test(result.defaultWords[i].word)){
+		// 			// console.log("Word matched: "+result.defaultWords[i].word);
+		// 		    result.defaultWords[i].count+=1;
+				    
+		// 		}
+
+		// 	}
+		// 	console.log(result.defaultWords);
+		// });
+
 		switch(censorCharacter){
 			case "****":
 				replaceWords(text,element,wordRegex,"****",node);
@@ -247,14 +244,16 @@ function censorWord(text,element,wordRegex,node) {
 //Remove Method
 function removeWord(text,element,wordRegex,node){
 	if(wordRegex.test(text) === true){
+		profanityCount++;
 		replaceWords(text,element,wordRegex,"",node);
 	}
 }
 
 function replaceWords(text,element,wordRegex,replace,node){
+	profanityCount++;
+	console.log(profanityCount);
 	var replacedText = text.replace(wordRegex, replace);
 	element.replaceChild(document.createTextNode(replacedText), node);
-	profanityCount++;
 }
 
 function replaceAndSubstitute(word){
@@ -269,7 +268,10 @@ function toggleFilter(){
 	}
 }
 
-// if(window.confirm("You are about to enter a website that contains a lot of profanity")){}
 checkWarningDomain();
+// chrome.storage.sync.get(['defaultWords'],function(result){
+// 	for(var i = 0;i < result.defaultWords.length; i++){
+// 		console.log(result.defaultWords[i].word);
+// 	}
+// });
 loadSettings();
-// }                  
