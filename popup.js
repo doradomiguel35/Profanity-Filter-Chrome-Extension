@@ -1,16 +1,14 @@
 var passwordProperty;
 console.log("popup.js loaded");
 
-
-function toggleFilter(){
-	var toggleFilterchecked = document.getElementById('toggleFilter').checked;
-	
+function toggleFilter(event){
+	var toggleFilterchecked = document.getElementById('notification').checked;
 	chrome.storage.sync.get(['password'],function(pass){
 		chrome.storage.sync.get(['filterToggle'],function(toggle){
 			passwordProperty = pass.password;
 			if(passwordProperty ===  "null"){
-				disable(document.getElementById('toggleFilter'));
-				document.getElementById('toggleFilter').checked = false;
+				disable(document.getElementById('notification'));
+				document.getElementById('notification').checked = false;
 				var html = '<h4> Please Enter New Password </h4>';
 				html+= '<input type="password" id="newPass" placeholder="New Password"/>';
 				html+= '<input type="password" id="confirmPass" placeholder="Confirm Password"/>';
@@ -22,24 +20,29 @@ function toggleFilter(){
 			}
 
 
-			else if(toggleFilterchecked){
+			else if(toggleFilterchecked === false){
 				chrome.storage.sync.set({filterToggle: toggleFilterchecked},function(){
-					document.getElementById('toggle');
-					console.log("Toggle state is "+toggleFilterchecked);
-					chrome.tabs.reload();
+					var html = '<h4> Please Enter Password </h4>';
+					html+= '<input type="password" id="exPass"/>';
+					html+= '<div id="loginStatus"></div>';
+					html+= '<br>';
+					html+= '<button id="offPass">Enter Password</button>';
+					document.getElementById('inputPassword').innerHTML = html;
+					document.getElementById('offPass').addEventListener('click',checkPassword);
+					document.getElementById('notification').checked = true;
 				});
 			}
 
 			else if(passwordProperty != "null"){
-				disable(document.getElementById('toggleFilter'));
+				disable(document.getElementById('notification'));
 				var html = '<h4> Please Enter Password </h4>';
 				html+= '<input type="password" id="exPass"/>';
 				html+= '<div id="loginStatus"></div>';
 				html+= '<br>';
-				html+= '<button id="storageExPass">Enter Password</button>'
+				html+= '<button id="storageExPass">Enter Password</button>';
 				document.getElementById('inputPassword').innerHTML = html;
 				document.getElementById('storageExPass').addEventListener('click',checkPassword);
-				document.getElementById('toggleFilter').checked = false;
+				document.getElementById('notification').checked = false;
 			}
 
 			else{
@@ -58,14 +61,34 @@ function checkToggle(){
 	chrome.storage.sync.get(['toggleFilter'],function(toggle){
 		if(toggle.toggleFilter === true){
 			console.log("Toggle state is "+toggle.toggleFilter);
-			document.getElementById('toggleFilter').checked;
+			document.getElementById('notification').checked = true;
 		}
 
 		else{
 			console.log("Toggle state is "+toggle.toggleFilter);
-			document.getElementById('toggleFilter').checked = false;
+			document.getElementById('notification').checked = false;
 		}
 	});
+}
+
+function runTimer() {
+	var switchState = document.getElementById("notification").checked;
+    chrome.storage.sync.set({
+        'value' : switchState
+    }, function () {
+        console.log("Switch Saved as " + switchState);
+    });
+	
+}
+
+function restoreOptions() {
+    // Use default value = false.
+    chrome.storage.sync.get({
+        filterToggle: false
+    }, function (items) {
+        document.getElementById('notification').checked = items.filterToggle;
+        console.log(items.filterToggle);
+    });
 }
 
 function disable(element){
@@ -78,29 +101,21 @@ function enable(element){
 	element.classList.remove('disabled');
 }
 
-function checkToggle(){
-	chrome.storage.sync.get(['filterToggle'],function(result){
-		var toggle = result.filterToggle;
-		if(toggle === true){
-			 document.getElementById('toggleFilter').checked;
-		}
-		else{
-			document.getElementById('toggleFilter');
-		}
-	});
-}
-
 function setPassword(){
 	var newPass = document.getElementById('newPass').value;
 	var confirmPass = document.getElementById('confirmPass').value;
-	document.getElementById('toggleFilter').checked;
+	var toggle = document.getElementById('notification').checked;
 	if(newPass === confirmPass){
 		chrome.storage.sync.set({password:newPass},function(){
-			enable(document.getElementById('toggleFilter'));
-			document.getElementById('inputPassword').innerHTML = '<div id="inputPassword"></div>';
-			document.getElementById('toggleFilter').checked;
-			toggleFilter();
-			console.log("New Password:"+newPass);
+			chrome.storage.sync.set({toggleFilter: toggle},function(){
+				enable(document.getElementById('notification'));
+				console.log(toggle);
+				document.getElementById('notification').checked = true;
+				chrome.tabs.reload();
+				var blankHTML = "";
+				document.getElementById('inputPassword').innerHTML = blankHTML;
+				console.log("New Password:"+newPass);
+			});
 		});
 	}
 	else{
@@ -110,25 +125,43 @@ function setPassword(){
 
 function checkPassword(){
 	var enterPassword = document.getElementById('exPass').value;
+	var checkToggle = document.getElementById('notification').checked;
 	console.log(enterPassword);
 	console.log(passwordProperty);
 	if(enterPassword === passwordProperty){
-		enable(document.getElementById('toggleFilter'));
+		enable(document.getElementById('notification'));
 		document.getElementById('inputPassword').innerHTML = '<div id="inputPassword"></div>';
-		document.getElementById('toggleFilter').checked;
-		chrome.storage.sync.set({filterToggle: true},function(){
-				// document.getElementById('toggleFilter').checked;
-				console.log("Toggle state is true")		;
+		
+		if(checkToggle === true){
+			chrome.storage.sync.set({filterToggle: false},function(){
+					// document.getElementById('toggleFilter').checked;
+					console.log("Toggle state is true")		;
+					chrome.tabs.reload();
+					document.getElementById('notification').checked = false;
+			});
+		}
+
+		else if(checkToggle === false){
+			chrome.storage.sync.set({filterToggle: true}, function(){
+				console.log("Toggle state is true");
 				chrome.tabs.reload();
-				document.getElementById('toggleFilter').checked;
-		});
+				document.getElementById('notification').checked = true;
+			});
+		}
+
 	}
 	else{
-		var html = '<h2> Incorrect Password </h2>';
+		var html = '<p> Incorrect Password <p>';
 		document.getElementById('loginStatus').innerHTML = html;
 	}
 }
-checkToggle();
+
+// checkToggle();
 // document.getElementById('storageNewPass').addEventListener('click',setPassword);
-document.getElementById('toggleFilter').addEventListener('change',toggleFilter);
+// document.getElementById('toggleFilter').addEventListener('change',toggleFilter);
+document.addEventListener('DOMContentLoaded', function () {
+	restoreOptions();
+    document.getElementById("notification").addEventListener('click', toggleFilter);
+    console.log("DOM Loaded");
+});
 document.getElementById('options').addEventListener('click', function() {chrome.runtime.openOptionsPage(); });
