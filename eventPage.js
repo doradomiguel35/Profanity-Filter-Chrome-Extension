@@ -1,8 +1,8 @@
 chrome.runtime.onInstalled.addListener(function(details){
     var defaultSettings = {
 		censorCharacter: "****",
-		filterMethod: "1",
-		filterToggle: true,
+		filterMethod: "0",
+		filterToggle: false,
 		matchMethod: "0",
 		password: "null", 
 		warningDomains: [
