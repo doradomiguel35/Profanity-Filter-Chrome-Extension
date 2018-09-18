@@ -56,21 +56,6 @@ function toggleFilter(event){
 	});
 }
 	
-function checkToggle(){
-	console.log("Function executed");
-	chrome.storage.sync.get(['toggleFilter'],function(toggle){
-		if(toggle.toggleFilter === true){
-			console.log("Toggle state is "+toggle.toggleFilter);
-			document.getElementById('notification').checked = true;
-		}
-
-		else{
-			console.log("Toggle state is "+toggle.toggleFilter);
-			document.getElementById('notification').checked = false;
-		}
-	});
-}
-
 function runTimer() {
 	var switchState = document.getElementById("notification").checked;
     chrome.storage.sync.set({
@@ -82,7 +67,6 @@ function runTimer() {
 }
 
 function restoreOptions() {
-    // Use default value = false.
     chrome.storage.sync.get({
         filterToggle: false
     }, function (items) {
@@ -135,6 +119,7 @@ function checkPassword(){
 		if(checkToggle === true){
 			chrome.storage.sync.set({filterToggle: false},function(){
 					// document.getElementById('toggleFilter').checked;
+
 					console.log("Toggle state is true")		;
 					chrome.tabs.reload();
 					document.getElementById('notification').checked = false;
@@ -156,12 +141,43 @@ function checkPassword(){
 	}
 }
 
-// checkToggle();
-// document.getElementById('storageNewPass').addEventListener('click',setPassword);
-// document.getElementById('toggleFilter').addEventListener('change',toggleFilter);
+function optionPassword(event){
+	var optionPass = document.getElementById('passOption').value;
+	chrome.storage.sync.get(['password'],function(pass){
+		if(optionPass === pass.password){
+			chrome.runtime.openOptionsPage(); 
+		}
+
+		else{
+			var html = "Incorrect Password";
+			document.getElementById('optionNotif').innerHTML = html;
+		}
+	});
+}
+
 document.addEventListener('DOMContentLoaded', function () {
 	restoreOptions();
     document.getElementById("notification").addEventListener('click', toggleFilter);
     console.log("DOM Loaded");
 });
-document.getElementById('options').addEventListener('click', function() {chrome.runtime.openOptionsPage(); });
+
+document.getElementById('options').addEventListener('click', function() {
+	var html;
+	chrome.storage.sync.get(['password'],function(pass){
+		if(pass.password === "null"){
+			html = '<h4> Click the toggle to set password</h4>';
+			document.getElementById('optionsPassword').innerHTML = html;
+		}
+
+		else{
+			html = '<h4> Please Enter Password </h4>';
+			html+= '<input type="password" id="passOption"/>';
+			html+= '<div id="loginStatus"></div>';
+			html+= '<br>';
+			html+= '<button id="optionPass">Enter Password</button>';
+			html+= '<div id="optionNotif"></div>';
+			document.getElementById('optionsPassword').innerHTML = html;
+			document.getElementById('optionPass').addEventListener('click',optionPassword);
+		}
+	});
+});
