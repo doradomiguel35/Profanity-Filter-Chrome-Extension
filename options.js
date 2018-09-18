@@ -335,21 +335,7 @@ for (var i = 0; i < tabs.length; i++) {
   tabs[i].addEventListener('click', function(e) { openTab(e); });
 }
 
-// var substituteWords = [
-// 						{word: "fck", substitute: "[lve]"},
-// 						{word: "fuck", substitute: "[love]"},
-// 						{word: "fuckable", substitute: "[loveable]"},
-// 						{word: "fucked", substitute: "[loved]"},
-// 						{word: "fucker", substitute: "[lover]"},
-// 						{word: "fuckin", substitute: "[lovin]"},
-// 						{word: "fucks", substitute: "[loves]"},
-// 						{word: "fvck", substitute: "[lve]"}
-// 					];
-
 retrieveSettings();
-// chrome.storage.sync.set({substituteWords},function(){
-// 	console.log("test");
-// });
 
 //Listeners   
 document.getElementById('btnRemove').addEventListener('click',removeWord);
