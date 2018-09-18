@@ -51,7 +51,7 @@ function retrieveSettings(){
 		}
 	});
 	sortSites();
-	populatewordTable();
+	// populatewordTable();
 	// populateTable();
 	populateWarningDomains();
 	
@@ -59,22 +59,37 @@ function retrieveSettings(){
 
 function sortSites(){
 	chrome.storage.sync.get(['websites'],function(result){
-		var sort_by = function(field, reverse, primer){
-		var key = primer ? 
-	       function(x) {return primer(x[field])} : 
-	       function(x) {return x[field]};
-			reverse = !reverse ? 1 : -1;
-			return function (a, b) {
-		       return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
-		     } 
-		}
-		var unsorted = result.websites;
-		var websites = unsorted.sort(sort_by('count', true, parseInt));
-		chrome.storage.sync.set({websites},function(){
-			console.log("Sites sorted");
-		});	
+		chrome.storage.sync.get(['substituteWords'],function(sub){
+			var sort_by = function(field, reverse, primer){
+			var key = primer ? 
+		       function(x) {return primer(x[field])} : 
+		       function(x) {return x[field]};
+				reverse = !reverse ? 1 : -1;
+				return function (a, b) {
+			       return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+			     } 
+			}
+			var unsorted = result.websites;
+			var websites = unsorted.sort(sort_by('count', true, parseInt));
+			chrome.storage.sync.set({websites},function(){
+				console.log("Sites sorted");
+			});	
+
+			var substituteWords = sub.substituteWords;
+			substituteWords = substituteWords.sort(function(a, b){
+				if(a.word > b.word) return 1;
+				if(a.word < b.word) return -1;
+				return 0;
+			});
+
+			console.log(substituteWords);
+			chrome.storage.sync.set({substituteWords},function(){
+				console.log("Words sorted");
+			});
+		});
 	});
 	populateTable();
+	populatewordTable();
 }
 
 function populatewordTable(){
@@ -95,7 +110,6 @@ function populatewordTable(){
 	});
 	
 }
-
 
 function populateTable(){
 	chrome.storage.sync.get(['websites'],function(result){
@@ -162,7 +176,7 @@ function saveSettings(){
 
 function addDomain(event){
 	var domain = document.getElementById('domainText').value;
-	var regexpDomain = new RegExp(domain);
+	var regexpDomain = new RegExp(domain,'gi'); 
 	var warningDomains;
 	var stringifyDomains;
 	var htmlNotif;
@@ -217,7 +231,7 @@ function removeDomain(event){
 function addWord(event){
 	var word = document.getElementById('addWords').value;
 	var substitute = document.getElementById('substitute').value;
-	var regExpWord = new RegExp(word);
+	var regExpWord = new RegExp("\\b"+word+"\\b",'i');
 	var stringifyWord;
 	var defaultWords;
 	var substituteWords;
