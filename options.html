@@ -10,6 +10,7 @@
 		  <nav>
 		    <span class="tablinks active">Settings</span>
 		    <span class="tablinks">Ranks</span>
+		    <span class="tablinks">Words</span>
 		    
 		  </nav>
 		</div>
@@ -88,22 +89,37 @@
 		    <button id="domainAdd">Add</button>
 		    <div id="addNotif"></div>
 		    <br>
-		  </div>
+		    <!-- Websites -->
+			 <table id="siteAndCount">
+			  	<thead>
+				  	<tr>
+				  		<th>Websites</th>
+				  		<th>Profanity Count</th>
+				  	</tr>
+			  	</thead>
+			  	<tbody style="overflow: auto;">	
+				  	<!-- <tr>
+				  		<td><div id="site"></div></td>
+				  		<td><div id="count"></div></td>
+				  	</tr> -->
+			  	</tbody>
+			 </table>
+			</div>
+		</div>
 
-		  <table id="siteAndCount">
-		  	<thead>
-			  	<tr>
-			  		<th width="500">Website</th>
-			  		<th>Profanity Count</th>
-			  	</tr>
-		  	</thead>
-		  	<tbody style="overflow: auto;">	
-			  	<tr>
-			  		<td><div id="site"></div></td>
-			  		<td><div id="count"></div></td>
-			  	</tr>
-		  	</tbody>
-		 </table>
+		<div id="Words" class="tabcontent hidden">
+			<table id="wordCounts">
+				<thead>
+					<tr>
+						<th>Word</th>
+						<th>Count</th>
+					</tr>
+				</thead>
+				<tbody>
+					<td><div id="wordRank"></div></td>
+					<td><div id="wordCount"></div></td>
+				</tbody>
+			</table>
 		</div>
 		
 	</div>
