@@ -1,42 +1,3 @@
-var defaultWords = [
-	"asses","asshole","assshit","ass-hat",,"asssucker",
-	"assbag","assbite","asscock","assfuck","asshead",
-	"asslick","asslicker","assmonkey","assmunch","ass",
-	"anal",
-	"bastard","blowjob","bampot","bitchass","bitchy",
-	"bullshit","bitch",
-	"cunt","creampie","cum","clitface",
-	"clusterfuck","cockass","cockbite","cockburger","cockface",
-	"cockhead","cockmonkey","cocknose","cocknugget","cockshit",
-	"cockwaffle","cumbubble","cumslut","cumtart","cuntass",
-	"cumdumpster","cuntface","cuntrag","cuntslut","cock",
-	"damn","douche","douchebag","deepthroat","dildo","dildos",
-	"dickbag","dickface","dickfuck","dickfucker","dickhead",
-	"dickjuice","dickmilk","dicksuck er","dickwad","dickweasel",
-	"dickweed","dickwod","dipshit","doochbag","douchefag",
-	"dumass","dumb ass","dumbass","dumbfuck","dumbshit","dumshit","dick",
-	"fagfucker","fvck","fucker","fuckers","fucks","fucken","fucking","fuckass","fucked","fuck","fuckin",
-	"fck",
-	"handjob","holyshit",
-	"motherfucker",
-	"orgy",
-	"piss","pissed","pissing",
-	"shite","shit", 		
-	"whore"
-];
-
-var substituteWords = {
-	'asses':'[butts]','asshole':'[butthole]',		
-	'assshit':'[buttard]','ass-hat':'[butt-hat]',
-	'asssucker':'[buttsipper]','assbag':'[buttbag]',
-	'assbite':'[buttbite]','asscock':'[buttcrook]',
-	'assfuck':'[buttmate]','asshead':'[butthead]',
-	'asslick':'[buttlick]','asslicker':'[buttlicker]',
-	'assmonkey':'[buttmonkey]','assmunch':'[butmunch]',
-	'ass':'[butt]','anal':'[butt]','bastard':'[no father]',
-	'dildo':'[toy]','dildos':'[toys]',
-};
-
 var settings = {
 	"filterMethod": 1,
 	"censorCharacter": "*",
@@ -45,8 +6,7 @@ var settings = {
 	"password": "null",
 };
 
-var innerBody = document.getElementsByTagName("*");
-
+var innerBody = document.querySelectorAll('body *')
 var filterMethod,censorCharacter,filterToggle,matchMethod,site;
 var matchMethod = 0;
 var wordRegex;
@@ -54,76 +14,87 @@ var stringifyObject;
 var retrieveCount;
 var regexpSite;
 var profanityCount = 0;
+var words = [];
+
 
 console.log("UnseeIt V1.0 Ready");
 
 function loadSettings(){
-	var websites= [];
 	chrome.storage.sync.get(settings,function(settings){
 		filterMethod = settings.filterMethod;
 		censorCharacter = settings.censorCharacter;
 		filterToggle = settings.filterToggle;
 		matchMethod = settings.matchMethod;
-		var origin_site = document.location.origin;
-		
 		toggleFilter();
-		chrome.storage.sync.get(['websites'],function(result){
-			console.log("Number of words filtered: "+profanityCount);
-			stringifyObject = JSON.stringify(result.websites);
-			regexpSite = new RegExp(origin_site);
-
-			for(var i = 0;i < result.websites.length; i++){
-				site = result.websites[i].site;
-				regexpSite = new RegExp(origin_site);
-
-				//Check if site is existing 
-				if(origin_site === site){
-					console.log(origin_site);
-					stringifyObject = JSON.stringify(result.websites);
-					var replaceObject = stringifyObject.replace(result.websites[i].count,function(){
-							retrieveCount = parseInt(result.websites[i].count);
-							retrieveCount+=profanityCount;
-							return retrieveCount.toString();
-					});
-					websites = JSON.parse(replaceObject);
-					chrome.storage.sync.set({websites},function(){
-						websites.push(JSON.parse(replaceObject));
-					});
-				}
-			}
-
-			//Check if site is non-existing
-			if(regexpSite.test(JSON.stringify(websites))!= true){
-					addWebStatistics(origin_site,profanityCount);
-			}
-		});
 	});
 }
 
 function filterWords(){
+	var origin_site = document.location.origin;
+	var websites;
 	chrome.storage.sync.get(['defaultWords'],function(result){
-		for (var k = 0; k < result.defaultWords.length; k++) {
-			var words = result.defaultWords[k].word;
-			for (var i = 0; i < innerBody.length; i++) {
-			  var element = innerBody[i];
-				for (var j = 0; j < element.childNodes.length; j++) {
-					var node = element.childNodes[j];
-					if (node.nodeType === 3) {
+		chrome.storage.sync.get(['substituteWords'],function(sub){
+			for (var k = 0; k < result.defaultWords.length; k++) {
+				var words = result.defaultWords[k].word;
+				for (var i = 0; i < innerBody.length; i++) {
+				  var element = innerBody[i];
+					for (var j = 0; j < element.childNodes.length; j++) {
+						var node = element.childNodes[j];
 						var text = node.nodeValue;
+						var defaultWords = result.defaultWords;
 						var wordRegexMethod = globalMatchMethods(matchMethod,result.defaultWords[k].word);
 						//Censor/Remove methods
 						if(filterMethod != "1"){ 
-							switchFilterMethods(filterMethod,text,element,wordRegexMethod,node);
+							switchFilterMethods(filterMethod,text,element,wordRegexMethod,node,result.defaultWords[k].word,defaultWords);
 						}
 
 						else{
 							//Substitute method
-							substituteWord(text,element,wordRegexMethod,node,result.defaultWords[k].word);
+							if(wordRegexMethod.test(text) === true){
+								for(var i = 0; i < sub.substituteWords.length; i++){
+									var objectWord = sub.substituteWords[i].word;
+									var substitutedWord = sub.substituteWords[i].substitute;
+									if(objectWord === result.defaultWords[k].word){
+										replaceWords(text, element, wordRegexMethod,substitutedWord,node,result.defaultWords[k].word,defaultWords);
+									}
+								}
+							}
 						}
-					} 
+						
+					}
+				}	
+			}
+
+			chrome.storage.sync.get(['websites'],function(result){
+				console.log("Number of words filtered: "+profanityCount);
+				stringifyObject = JSON.stringify(result.websites);
+				regexpSite = new RegExp(origin_site);
+
+				for(var i = 0;i < result.websites.length; i++){
+					site = result.websites[i].site;
+					regexpSite = new RegExp(origin_site);
+
+					//Check if site is existing 
+					if(origin_site === site){
+						stringifyObject = JSON.stringify(result.websites);
+						var replaceObject = stringifyObject.replace(result.websites[i].count,function(){
+								retrieveCount = parseInt(result.websites[i].count);
+								retrieveCount+=profanityCount;
+								return retrieveCount.toString();
+						});
+						websites = JSON.parse(replaceObject);
+						chrome.storage.sync.set({websites},function(){
+							websites.push(JSON.parse(replaceObject));
+						});
+					}
 				}
-			}	
-		}
+
+				//Check if site is non-existing
+				if(regexpSite.test(JSON.stringify(websites))!= true){
+						addWebStatistics(origin_site,profanityCount);
+				}
+			});
+		});
 	});
 }
 
@@ -135,7 +106,7 @@ function addWebStatistics(site, profanityCount){
 				websites.push(result.websites[i]);
 		}
 		websites.push({"site":site, "count":profanityCount.toString()}); // Push new object to array
-		chrome.storage.sync.set({websites},function(){ // 
+		chrome.storage.sync.set({websites},function(){  
 			websites.push({"site":site, "count":profanityCount.toString()});
 		});
 	});
@@ -165,95 +136,88 @@ function globalMatchMethods(matchMethod,defaultWords){
 	return wordRegexMethod;
 }
 
-function switchFilterMethods(filterMethod,text,element,wordRegex,node){
+function switchFilterMethods(filterMethod,text,element,wordRegex,node,word,defaultWords){
 	switch(filterMethod){		
 		case "0"://Censor
-			censorWord(text,element,wordRegex,node);
+			censorWord(text,element,wordRegex,node,word,defaultWords);
 			break;
 		case "2"://Remove 
-			removeWord(text,element,wordRegex,node);
+			removeWord(text,element,wordRegex,node,word,defaultWords);
 			break;
 	}
-}
-
-//Substitute Method
-function substituteWord(text,element,wordRegex,node,defaultWords){
-	chrome.storage.sync.get(['substituteWords'],function(result){
-		if(wordRegex.test(text) === true){
-			for(var i = 0; i < result.substituteWords.length; i++){
-				var objectWord = result.substituteWords[i].word;
-				var substitutedWord = result.substituteWords[i].substitute;
-				if(objectWord === defaultWords){
-					replaceWords(text,element,wordRegex,substitutedWord,node);
-				}
-			}
-		}
-	});
 }
 
 //Censor Method
-function censorWord(text,element,wordRegex,node) {
+function censorWord(text,element,wordRegex,node,word,defaultWords){
 	if(wordRegex.test(text) === true){
-
-		// chrome.storage.sync.get(['defaultWords'],function(result){
-			
-			
-		// 	for(var i = 0; i < result.defaultWords.length; i++){
-		// 		if(wordRegex.test(result.defaultWords[i].word)){
-		// 			// console.log("Word matched: "+result.defaultWords[i].word);
-		// 		    result.defaultWords[i].count+=1;
-				    
-		// 		}
-
-		// 	}
-		// 	console.log(result.defaultWords);
-		// });
-
 		switch(censorCharacter){
 			case "****":
-				replaceWords(text,element,wordRegex,"****",node);
+				replaceWords(text,element,wordRegex,"****",node,word,defaultWords);
 				break;
 			case "&&&&":
-				replaceWords(text,element,wordRegex,"&&&&",node);
+				replaceWords(text,element,wordRegex,"&&&&",node,word,defaultWords);
 				break;
 			case "$$$$":
-				replaceWords(text,element,wordRegex,"$$$$$$$$",node);
+				replaceWords(text,element,wordRegex,"$$$$$$$$",node,word,defaultWords);
 				break;
 			case "####":
-				replaceWords(text,element,wordRegex,"####",node);
+				replaceWords(text,element,wordRegex,"####",node,word,defaultWords);
 				break;
 			case "@@@@":
-				replaceWords(text,element,wordRegex,"@@@@",node);
+				replaceWords(text,element,wordRegex,"@@@@",node,word,defaultWords);
 				break;
 			case "^^^^":
-				replaceWords(text,element,wordRegex,"^^^^",node);
+				replaceWords(text,element,wordRegex,"^^^^",node,word,defaultWords);
 				break;
 			case "----":
-				replaceWords(text,element,wordRegex,"----",node);
+				replaceWords(text,element,wordRegex,"----",node,word,defaultWords);
 				break;
 			case "____":
-				replaceWords(text,element,wordRegex,"____",node);
+				replaceWords(text,element,wordRegex,"____",node,word,defaultWords);
 				break;
 			case "mixed":
-				replaceWords(text,element,wordRegex,"*&$#",node);
+				replaceWords(text,element,wordRegex,"*&$#",node,word,defaultWords);
 				break;
 		}
 	}
+
 }
 
 //Remove Method
-function removeWord(text,element,wordRegex,node){
+function removeWord(text,element,wordRegex,node,word,defaultWords){
 	if(wordRegex.test(text) === true){
 		profanityCount++;
-		replaceWords(text,element,wordRegex,"",node);
+		replaceWords(text,element,wordRegex,"",node,word,defaultWords);
 	}
 }
 
-function replaceWords(text,element,wordRegex,replace,node){
+function replaceWords(text,element,wordRegex,replace,node,word,defaultWords){
 	profanityCount++;
-	console.log(profanityCount);
+	var wordCount;
 	var replacedText = text.replace(wordRegex, replace);
 	element.replaceChild(document.createTextNode(replacedText), node);
+	
+	let temp = defaultWords.find(e => e.word === word);
+	temp.count+=1;
+	
+	chrome.storage.sync.set({defaultWords},function(){
+		console.log(defaultWords);
+	});
+
+	
+}
+
+function assignKey(obj, key) {
+  typeof obj[key] === 'undefined' ? obj[key] = 1 : obj[key]++;
+}
+
+function findIndex(array, attr, value){
+	for(var i = 0; i < array.length; i += 1) {
+        if(array[i][attr] === value) {
+            return i; 
+        }
+    }
+    return -1;
 }
 
 function replaceAndSubstitute(word){
@@ -269,9 +233,4 @@ function toggleFilter(){
 }
 
 checkWarningDomain();
-// chrome.storage.sync.get(['defaultWords'],function(result){
-// 	for(var i = 0;i < result.defaultWords.length; i++){
-// 		console.log(result.defaultWords[i].word);
-// 	}
-// });
 loadSettings();
