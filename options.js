@@ -51,8 +51,6 @@ function retrieveSettings(){
 		}
 	});
 	sortSites();
-	// populatewordTable();
-	// populateTable();
 	populateWarningDomains();
 	
 }
@@ -60,70 +58,107 @@ function retrieveSettings(){
 function sortSites(){
 	chrome.storage.sync.get(['websites'],function(result){
 		chrome.storage.sync.get(['substituteWords'],function(sub){
-			var sort_by = function(field, reverse, primer){
-			var key = primer ? 
-		       function(x) {return primer(x[field])} : 
-		       function(x) {return x[field]};
-				reverse = !reverse ? 1 : -1;
-				return function (a, b) {
-			       return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
-			     } 
-			}
-			var unsorted = result.websites;
-			var websites = unsorted.sort(sort_by('count', true, parseInt));
-			chrome.storage.sync.set({websites},function(){
-				console.log("Sites sorted");
-			});	
+			chrome.storage.sync.get(['defaultWords'],function(words){
+				var sort_by = function(field, reverse, primer){
+				var key = primer ? 
+			       function(x) {return primer(x[field])} : 
+			       function(x) {return x[field]};
+					reverse = !reverse ? 1 : -1;
+					return function (a, b) {
+				       return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+				     } 
+				}
 
-			var substituteWords = sub.substituteWords;
-			substituteWords = substituteWords.sort(function(a, b){
-				if(a.word > b.word) return 1;
-				if(a.word < b.word) return -1;
-				return 0;
-			});
+				// Sort website rank
+				var unsorted = result.websites;
+				var websites = unsorted.sort(sort_by('count', true, parseInt));
+				
+				chrome.storage.sync.set({websites},function(){
+					console.log("Sites sorted");
+				});	
 
-			console.log(substituteWords);
-			chrome.storage.sync.set({substituteWords},function(){
-				console.log("Words sorted");
+				//Sort word rank
+				var unsorted_words = words.defaultWords;
+				var defaultWords = unsorted_words.sort(sort_by('count',true, parseInt));
+
+				chrome.storage.sync.set({defaultWords},function(){
+					console.log("Words sorted");
+				});
+
+				//Word List A-Z
+				var substituteWords = sub.substituteWords;
+				substituteWords = substituteWords.sort(function(a, b){
+					if(a.word > b.word) return 1;
+					if(a.word < b.word) return -1;
+					return 0;
+				});
+
+				chrome.storage.sync.set({substituteWords},function(){
+					console.log("Words sorted");
+				});
 			});
 		});
 	});
-	populateTable();
-	populatewordTable();
+	populateWebsiteTable();
+	populateWordRankTable();
+	populateWordTable();
 }
 
-function populatewordTable(){
-	var stringifySubstitute;
-	var arraySub = [];
-	var counter = 0;
-	chrome.storage.sync.get(['substituteWords'],function(sub){
-		for(var i = 0; i < sub.substituteWords.length; i++){
-			counter++;
-			htmlWord+= counter+". "+sub.substituteWords[i].word+'<br><br>';
-			htmlSubstitute+= sub.substituteWords[i].substitute+'<br><br>';
-			htmlWord = htmlWord.replace("undefined","");
-			htmlSubstitute = htmlSubstitute.replace("undefined","");
-			document.getElementById('word').innerHTML = htmlWord;
-			document.getElementById('wordSubstitute').innerHTML = htmlSubstitute;
+function populateWordRankTable(){
+	chrome.storage.sync.get(['defaultWords'],function(result){
+		var table = document.getElementById('wordCounts');
+
+		for(var i = 0 ; i < result.defaultWords.length ; i++){
+			var defaultWords = result.defaultWords[i];
+			var row = document.createElement('tr');
+			var properties = ['word','count'];
+
+			for(var k = 0; k < properties.length ; k++){
+				var cell = document.createElement('td');
+				cell.innerHTML = defaultWords[properties[k]];
+				row.appendChild(cell);
+			}
+			table.appendChild(row);
 		}
-		console.log("Word table populated");
+	});
+}
+
+function populateWordTable(){
+	chrome.storage.sync.get(['substituteWords'],function(sub){
+		var table = document.getElementById('wordAndSubstitute');
+
+		for(var i = 0; i < sub.substituteWords.length ; i++){
+			var substitute = sub.substituteWords[i];
+			var row = document.createElement('tr');
+			var properties = ['word','substitute'];
+
+			for(var k = 0; k < properties.length ; k++){
+				var cell = document.createElement('td');
+				cell.innerHTML = substitute[properties[k]];
+				row.appendChild(cell);
+			}
+			table.appendChild(row);
+		}
 	});
 	
 }
 
-function populateTable(){
+function populateWebsiteTable(){
 	chrome.storage.sync.get(['websites'],function(result){
-		var counter = 0;
-		for(var i = 0 ; i < result.websites.length ; i++){
-			counter++;
-			htmlSite+= counter+". "+result.websites[i].site+'<br><br>';
-			htmlCount+= result.websites[i].count+'<br><br>';
-			htmlSite = htmlSite.replace("undefined","");
-			htmlCount = htmlCount.replace("undefined","");
-			document.getElementById('site').innerHTML = htmlSite;
-			document.getElementById('count').innerHTML = htmlCount;
-		}
-		console.log("Table populated");
+		var table = document.getElementById('siteAndCount');
+		
+		for(var i = 0; i < result.websites.length ; i++){
+			var websites = result.websites[i];
+			var row = document.createElement('tr');
+			var properties = ['site','count'];
+
+			for(var k = 0; k < properties.length; k++){
+				var cell = document.createElement('td');
+				cell.innerHTML = websites[properties[k]];
+				row.appendChild(cell);
+			}
+			table.appendChild(row);
+		}	
 	}); 
 }
 
@@ -350,7 +385,6 @@ for (var i = 0; i < tabs.length; i++) {
 }
 
 retrieveSettings();
-
 //Listeners   
 document.getElementById('btnRemove').addEventListener('click',removeWord);
 document.getElementById('btnAdd').addEventListener('click',addWord);
