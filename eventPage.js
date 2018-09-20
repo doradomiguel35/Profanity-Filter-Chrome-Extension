@@ -19,7 +19,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 			{"count": "128","site": "https://www-urbandictionary-com.cdn.ampproject.org"},
 			{"count": "118","site": "https://stackoverflow.com"}
 			],
-		defaultWord: [
+		defaultWords: [
 			{"count": 0,"word": "fuck"},
 			{"count": 0,"word": "fuckable"},
 			{"count": 0,"word": "fucked"},
