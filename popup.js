@@ -19,9 +19,8 @@ function toggleFilter(event){
 				document.getElementById('storageNewPass').addEventListener('click',setPassword);
 			}
 
-
 			else if(toggleFilterchecked === false){
-				chrome.storage.sync.set({filterToggle: toggleFilterchecked},function(){
+				// chrome.storage.sync.set({filterToggle: toggleFilterchecked},function(){
 					var html = '<h4> Please Enter Password </h4>';
 					html+= '<input type="password" id="exPass"/>';
 					html+= '<div id="loginStatus"></div>';
@@ -30,7 +29,7 @@ function toggleFilter(event){
 					document.getElementById('inputPassword').innerHTML = html;
 					document.getElementById('offPass').addEventListener('click',checkPassword);
 					document.getElementById('notification').checked = true;
-				});
+				// });
 			}
 
 			else if(passwordProperty != "null"){
@@ -44,15 +43,7 @@ function toggleFilter(event){
 				document.getElementById('storageExPass').addEventListener('click',checkPassword);
 				document.getElementById('notification').checked = false;
 			}
-
-			else{
-				chrome.storage.sync.set({filterToggle: toggleFilterchecked},function(){
-					// document.getElementById('toggleFilter');
-					console.log("Toggle state is "+toggleFilterchecked);
-					chrome.tabs.reload();
-				});
-			}
-	    });
+		});
 	});
 }
 	
@@ -118,8 +109,6 @@ function checkPassword(){
 		
 		if(checkToggle === true){
 			chrome.storage.sync.set({filterToggle: false},function(){
-					// document.getElementById('toggleFilter').checked;
-
 					console.log("Toggle state is true")		;
 					chrome.tabs.reload();
 					document.getElementById('notification').checked = false;
