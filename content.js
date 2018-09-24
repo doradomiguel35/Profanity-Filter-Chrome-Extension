@@ -15,7 +15,7 @@ var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-spa
 var defaultWords = [];
 var substituteWords = [];
 var websites = [];
-var origin_site = document.location.origin;
+var origin_site;
 
 
 
@@ -37,6 +37,8 @@ function loadSettings(){
 					matchMethod = settings.matchMethod;
 					profanityCount = 0;
 					origin_site = document.location.origin;
+					console.log(defaultWords.length);
+					console.log(substituteWords.length);
 					toggleFilter();
 				});
 			});
