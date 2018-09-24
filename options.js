@@ -50,8 +50,7 @@ function retrieveSettings(){
 				censorCharacterSelectCmb.value = censorCharacterSelectStorage;
 		}
 	});
-	sortSites();
-	populateWarningDomains();
+	
 	
 }
 
@@ -71,6 +70,16 @@ function sortSites(){
 
 				// Sort website rank
 				var unsorted = result.websites;
+				for(var i = 0; i < result.websites.length; i++){
+					if(result.websites[i].count === "0"){
+						delete result.websites[i];
+						unsorted = result.websites;
+						unsorted = unsorted.filter(function(x){
+	  					return (x !== (undefined || null || ''));
+	  					});
+	  					console.log("Site deleted");
+					}
+				}
 				var websites = unsorted.sort(sort_by('count', true, parseInt));
 				
 				chrome.storage.sync.set({websites},function(){
@@ -102,6 +111,7 @@ function sortSites(){
 	populateWebsiteTable();
 	populateWordRankTable();
 	populateWordTable();
+	populateWarningDomains();
 }
 
 function populateWordRankTable(){
@@ -204,9 +214,10 @@ function saveSettings(){
 	}
 
 	chrome.storage.sync.set(saveSettings,function(){
-		
+		var htmlSave = "Settings saved";
+		document.getElementById('saveNotif').innerHTML = htmlSave;
 	});
-	alert	("Settings Saved");
+	
 }
 
 function addDomain(event){
@@ -383,7 +394,7 @@ var tabs = document.getElementsByClassName('tablinks');
 for (var i = 0; i < tabs.length; i++) {
   tabs[i].addEventListener('click', function(e) { openTab(e); });
 }
-
+sortSites();
 retrieveSettings();
 //Listeners   
 document.getElementById('btnRemove').addEventListener('click',removeWord);

@@ -78,7 +78,6 @@ chrome.runtime.onInstalled.addListener(function(details){
 			{"count": 0,"word": "expression"},
 			{"count": 0,"word": "douche"},
 			{"count": 0,"word": "douchebag"},
-			{"count": 0,"word": "insensitive"},
 			{"count": 0,"word": "deepthroat"},
 			{"count": 0,"word": "dildo"},
 			{"count": 0,"word": "dildos"},
@@ -227,7 +226,11 @@ chrome.runtime.onInstalled.addListener(function(details){
     }
 });
 
-chrome.runtime.onInstalled.addListener(function() {
-	
-    
-  });
+// chrome.webRequest.onCompleted.addListener(function(details) {
+//     var url = document.createElement('a');
+//     url.href = details.url;
+//     if (url.search && url.search.indexOf('ajaxpipe=1') !== -1) {
+//         console.log('New page via AJAX.');
+//         chrome.tabs.executeScript({'file' : 'content.js'});
+//     }
+// }, {urls : ["*://*.facebook.com/*"]});

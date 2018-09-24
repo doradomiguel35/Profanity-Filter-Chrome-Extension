@@ -5,7 +5,8 @@
     "icons": {"128": "images/logo128.png"},
     "description": "A profanity filter that censors profanity words expressed in English",
     "background": {
-    "scripts": ["eventPage.js"]
+        "scripts": ["eventPage.js"],
+        "persistent": false
     },
     "content_scripts": [
         {
@@ -36,5 +37,6 @@
         "activeTab",
         "storage",
         "tabs"
-     ]
+     ],
+    "incognito": "split"
  }
