@@ -20,16 +20,14 @@ function toggleFilter(event){
 			}
 
 			else if(toggleFilterchecked === false){
-				// chrome.storage.sync.set({filterToggle: toggleFilterchecked},function(){
-					var html = '<h4> Please Enter Password </h4>';
-					html+= '<input type="password" id="exPass"/>';
-					html+= '<div id="loginStatus"></div>';
-					html+= '<br>';
-					html+= '<button id="offPass">Enter Password</button>';
-					document.getElementById('inputPassword').innerHTML = html;
-					document.getElementById('offPass').addEventListener('click',checkPassword);
-					document.getElementById('notification').checked = true;
-				// });
+				var html = '<h4> Please Enter Password </h4>';
+				html+= '<input type="password" id="exPass"/>';
+				html+= '<div id="loginStatus"></div>';
+				html+= '<br>';
+				html+= '<button id="offPass">Enter Password</button>';
+				document.getElementById('inputPassword').innerHTML = html;
+				document.getElementById('offPass').addEventListener('click',checkPassword);
+				document.getElementById('notification').checked = true;
 			}
 
 			else if(passwordProperty != "null"){
@@ -79,12 +77,10 @@ function enable(element){
 function setPassword(){
 	var newPass = document.getElementById('newPass').value;
 	var confirmPass = document.getElementById('confirmPass').value;
-	var toggle = document.getElementById('notification').checked;
 	if(newPass === confirmPass){
 		chrome.storage.sync.set({password:newPass},function(){
-			chrome.storage.sync.set({toggleFilter: toggle},function(){
+			chrome.storage.sync.set({filterToggle: true},function(){
 				enable(document.getElementById('notification'));
-				console.log(toggle);
 				document.getElementById('notification').checked = true;
 				chrome.tabs.reload();
 				var blankHTML = "";
