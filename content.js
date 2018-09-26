@@ -9,12 +9,11 @@ var settings = {
 var matchMethod = 0;
 var profanityCount = 0;
 var filterMethod,censorCharacter,filterToggle,matchMethod;
-var wordRegex,stringifyObject,retrieveCount,regexpSite,node,wordRegex;
+var wordRegex,stringifyObject,retrieveCount,regexpSite,node,wordRegex,websites;
 var xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
 var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
 var defaultWords = [];
 var substituteWords = [];
-var websites = [];
 var origin_site;
 
 
@@ -40,6 +39,8 @@ function loadSettings(){
 					console.log(defaultWords.length);
 					console.log(substituteWords.length);
 					toggleFilter();
+					checkWebsite();
+					mutationObserver();
 				});
 			});
 		});
@@ -57,6 +58,8 @@ function mutationObserver(){
     mutations.forEach(function(mutation) {
       checkNodeForProfanity(mutation);
     });
+    profanityCount++;
+    console.log(profanityCount);
   });
 
 
@@ -70,7 +73,6 @@ function checkNodeForProfanity(mutation) {
     if (!isForbiddenNode(node)) {
       filterWords(xpathNodeText, node);
     }
-
   });
 }
 
@@ -99,14 +101,61 @@ function filterWords(xpathExpression, node){
     textNode.data = replaceText(textNode.data);
   }
 
-  
+}
 
+function replaceText(text){
+	switch(filterMethod){
+		case "0"://Censor Method
+			for(var i = 0; i < defaultWords.length; i++){
+				// console.log(text+"==="+result.defaultWords[i].word);
+				var wordRegex = globalMatchMethods(matchMethod,defaultWords[i].word);
+				if(wordRegex.test(text) === true){
+					text = text.replace(wordRegex, censorCharacter);
+					profanityCount++;
+					let temp = defaultWords.find(e => e.word === defaultWords[i].word);
+					temp.count+=1;
+					chrome.storage.sync.set({defaultWords},function(){});
+				
+				}
+			}
+			
+			break;
+		case "1": //Substitute Method
+			for(var i = 0; i < substituteWords.length; i++){
+				var wordRegex = globalMatchMethods(matchMethod,substituteWords[i].word);
+				if(wordRegex.test(text) === true){
+					text = text.replace(wordRegex, substituteWords[i].substitute);
+					profanityCount++;
+					let temp = defaultWords.find(e => e.word === substituteWords[i].word);
+					chrome.storage.sync.set({defaultWords},function(){});
+				
+				}
+			}
+			
+			break;
+		case "2": //Remove Method
+			for(var i = 0; i < defaultWords.length; i++){
+				var wordRegex = globalMatchMethods(matchMethod,defaultWords[i].word);
+				if(wordRegex.test(text) === true){
+					text = text.replace(wordRegex, "");
+					profanityCount++;
+					let temp = defaultWords.find(e => e.word === defaultWords[i].word);
+					temp.count+=1;
+					chrome.storage.sync.set({defaultWords},function(){});
+				
+				}
+			}
+			
+			break;
+	}
+	
+	return text;
 }
 
 function checkWebsite(){
 	stringifyObject = JSON.stringify(websites);
 	regexpSite = new RegExp(origin_site);
-
+	console.log(origin_site);
 	for(var i = 0;i < websites.length; i++){
 		regexpSite = new RegExp(origin_site);
 
@@ -129,53 +178,6 @@ function checkWebsite(){
 	if(regexpSite.test(JSON.stringify(websites))!= true){
 			addWebStatistics(origin_site,profanityCount);
 	}
-}
-
-function replaceText(text){
-	switch(filterMethod){
-		case "0"://Censor Method
-			for(var i = 0; i < defaultWords.length; i++){
-				// console.log(text+"==="+result.defaultWords[i].word);
-				var wordRegex = globalMatchMethods(matchMethod,defaultWords[i].word);
-				if(wordRegex.test(text) === true){
-					text = text.replace(wordRegex, censorCharacter);
-					profanityCount++;
-					let temp = defaultWords.find(e => e.word === defaultWords[i].word);
-					temp.count+=1;
-					chrome.storage.sync.set({defaultWords},function(){});
-				}
-			}
-			
-			break;
-		case "1": //Substitute Method
-			for(var i = 0; i < substituteWords.length; i++){
-				var wordRegex = globalMatchMethods(matchMethod,substituteWords[i].word);
-				if(wordRegex.test(text) === true){
-					text = text.replace(wordRegex, substituteWords[i].substitute);
-					profanityCount++;
-					let temp = defaultWords.find(e => e.word === substituteWords[i].word);
-					console.log(temp+=1);
-					chrome.storage.sync.set({defaultWords},function(){});
-				}
-			}
-			
-			break;
-		case "2": //Remove Method
-			for(var i = 0; i < defaultWords.length; i++){
-				var wordRegex = globalMatchMethods(matchMethod,defaultWords[i].word);
-				if(wordRegex.test(text) === true){
-					text = text.replace(wordRegex, "");
-					profanityCount++;
-					let temp = defaultWords.find(e => e.word === defaultWords[i].word);
-					temp.count+=1;
-					chrome.storage.sync.set({defaultWords},function(){});
-				}
-			}
-			chrome.storage.sync.set({defaultWords},function(){});
-			break;
-	}
-	
-	return text;
 }
 
 function addWebStatistics(site, profanityCount){
@@ -230,10 +232,7 @@ function switchFilterMethods(filterMethod,text,element,wordRegex,node,word,defau
 function toggleFilter(){
 	if(filterToggle === true){
 		filterWords(xpathDocText);
-		checkWebsite();
-		checkWarningDomain();
-		mutationObserver();
 	}
 }
-
+checkWarningDomain();
 loadSettings();
