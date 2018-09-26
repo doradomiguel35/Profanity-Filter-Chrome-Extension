@@ -13,11 +13,11 @@ chrome.runtime.onInstalled.addListener(function(details){
 			"https://www.youtube.com",
 		],
 		websites: [
-			{"count": "3358","site": "https://www.google.com.ph"},
-			{"count": "249","site": "https://notifications.google.com"},
-			{"count": "143","site": "https://www.youtube.com"},
-			{"count": "128","site": "https://www-urbandictionary-com.cdn.ampproject.org"},
-			{"count": "118","site": "https://stackoverflow.com"}
+			{"count": "69","site": "https://www.google.com.ph"},
+			{"count": "32","site": "https://notifications.google.com"},
+			{"count": "38","site": "https://www.youtube.com"},
+			{"count": "64","site": "https://www.twitter.com"},
+			{"count": "47","site": "https://www.facebook.com"}
 			],
 		defaultWords: [
 			{"count": 0,"word": "fuck"},
@@ -116,6 +116,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 			{"count": 0,"word": "pissed"},
 			{"count": 0,"word": "pissing"},
 			{"count": 0,"word": "shite"},
+			{"count": 0,"word": "thefuck"},
 			{"count": 0,"word": "whore"}
 		],
 		substituteWords: [
@@ -215,13 +216,14 @@ chrome.runtime.onInstalled.addListener(function(details){
 			{"substitute": "[urinating]","word": "pissing"},
 			{"substitute": "[turd]","word": "shit"},
 			{"substitute": "[crap]","word": "shite"},
+			{"substitute": "[crap]","word": "thefuck"},
 			{"substitute": "[pathetic]","word": "whore"}
 		]
 	}
 
     if(details.reason == "install"){
        chrome.storage.sync.set(defaultSettings, function() {
-      	console.log("Extension successfully installed");
+      	alert("Extension successfully installed");
     });
     }
 });
