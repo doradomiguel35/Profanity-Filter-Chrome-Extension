@@ -288,11 +288,9 @@ function addWord(event){
 			substituteWords = sub.substituteWords;
 
 			stringifyWord = JSON.stringify(defaultWords);
-			// console.log(stringifyWord);
 
 			if(regExpWord.test(stringifyWord) === true){
 				htmlNotif = "Word already added";
-				console.log("Word already added");
 				document.getElementById('addNotif').innerHTML = htmlNotif;
 			}
 
