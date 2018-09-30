@@ -5,42 +5,97 @@ var settings = {
 	"matchMethod": 0,
 	"password": "null",
 };
-
+var currentDate = new Date();
+var dd = currentDate.getDate();
+var mm = currentDate.getMonth()+1;
+var yy = currentDate.getFullYear();
 var matchMethod = 0;
 var profanityCount = 0;
 var filterMethod,censorCharacter,filterToggle,matchMethod;
-var wordRegex,stringifyObject,retrieveCount,regexpSite,node,wordRegex,websites;
+var wordRegex,stringifyObject,retrieveCount,regexpSite,node,wordRegex,websites,multMethod;
 var xpathDocText = '//*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
 var xpathNodeText = './/*[not(self::script or self::style)]/text()[normalize-space(.) != ""]';
 var defaultWords = [];
 var substituteWords = [];
+var textHistory = [];
+var wordDates = [];
 var origin_site;
+
 
 
 
 var innerBody = document.querySelectorAll('*');
 
 console.log("UnseeIt V1.0 Ready");
-	
+
+// wordDates = [{date: "09/30/2018", wordHist:[{count: 1, word: "fuck"}]}];
+// chrome.storage.sync.set({wordDates},function(){});
+
+
+function retrieveSettings(xpathDocText,node){
+	chrome.storage.sync.get(settings,function(settings){
+		chrome.storage.sync.get(['defaultWords'],function(result){
+			chrome.storage.sync.get(['substituteWords'],function(sub){
+				chrome.storage.sync.get(['websites'],function(site){
+					chrome.storage.sync.get(['multipleMeaning'],function(mult){
+						chrome.storage.sync.get(['textHistory'],function(hist){
+							chrome.storage.sync.get(['wordDates'],function(date){
+								wordDates = date.wordDates;
+								textHistory = hist.textHistory;
+								defaultWords = result.defaultWords;
+								substituteWords = sub.substituteWords;
+								websites = site.websites;
+								filterMethod = settings.filterMethod;
+								censorCharacter = settings.censorCharacter;
+								filterToggle = settings.filterToggle;
+								matchMethod = settings.matchMethod;
+								profanityCount = 0;
+								origin_site = document.location.origin;
+								multMethod = mult.multipleMeaning;
+								if(dd<10) {dd = '0'+dd} 
+								if(mm<10) {mm = '0'+mm}
+								currentDate = (mm)+ "/"+ dd + "/" + yy;
+								filterWords(xpathDocText,node);
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+}
+
+
 function loadSettings(){
 	chrome.storage.sync.get(settings,function(settings){
 		chrome.storage.sync.get(['defaultWords'],function(result){
 			chrome.storage.sync.get(['substituteWords'],function(sub){
 				chrome.storage.sync.get(['websites'],function(site){
-					defaultWords = result.defaultWords;
-					substituteWords = sub.substituteWords;
-					websites = site.websites;
-					filterMethod = settings.filterMethod;
-					censorCharacter = settings.censorCharacter;
-					filterToggle = settings.filterToggle;
-					matchMethod = settings.matchMethod;
-					profanityCount = 0;
-					origin_site = document.location.origin;
-					console.log(defaultWords.length);
-					console.log(substituteWords.length);
-					toggleFilter();
-					checkWebsite();
-					mutationObserver();
+					chrome.storage.sync.get(['multipleMeaning'],function(mult){
+						chrome.storage.sync.get(['textHistory'],function(hist){
+							chrome.storage.sync.get(['wordDates'],function(date){
+								wordDates = date.wordDates;
+								textHistory = hist.textHistory;
+								defaultWords = result.defaultWords;
+								substituteWords = sub.substituteWords;
+								websites = site.websites;
+								filterMethod = settings.filterMethod;
+								censorCharacter = settings.censorCharacter;
+								filterToggle = settings.filterToggle;
+								matchMethod = settings.matchMethod;
+								profanityCount = 0;
+								origin_site = document.location.origin;
+								multMethod = mult.multipleMeaning;
+								// console.log(defaultWords.length);
+								// console.log(substituteWords.length);
+								if(dd<10) {dd = '0'+dd} 
+								if(mm<10) {mm = '0'+mm}
+								currentDate = mm+ "/"+ dd + "/" + yy;
+								// console.log(currentDate);  
+								toggleFilter();
+							});
+						});
+					});
 				});
 			});
 		});
@@ -58,12 +113,10 @@ function mutationObserver(){
     mutations.forEach(function(mutation) {
       checkNodeForProfanity(mutation);
     });
-    profanityCount++;
-    console.log(profanityCount);
+    // profanityCount++;
+    // console.log(profanityCount);
   });
-
-
-  // Remove profanity from new objects
+ // Remove profanity from new objects
   observer.observe(document, observerConfig);
 }
 
@@ -71,7 +124,8 @@ function checkNodeForProfanity(mutation) {
   mutation.addedNodes.forEach(function(node) {
     // console.log(isForbiddenNode(node));
     if (!isForbiddenNode(node)) {
-      filterWords(xpathNodeText, node);
+      // filterWords(xpathNodeText, node);
+      retrieveSettings(xpathNodeText, node);
     }
   });
 }
@@ -107,15 +161,71 @@ function replaceText(text){
 	switch(filterMethod){
 		case "0"://Censor Method
 			for(var i = 0; i < defaultWords.length; i++){
-				// console.log(text+"==="+result.defaultWords[i].word);
 				var wordRegex = globalMatchMethods(matchMethod,defaultWords[i].word);
 				if(wordRegex.test(text) === true){
-					text = text.replace(wordRegex, censorCharacter);
-					profanityCount++;
-					let temp = defaultWords.find(e => e.word === defaultWords[i].word);
-					temp.count+=1;
-					chrome.storage.sync.set({defaultWords},function(){});
-				
+					text = text.replace(/<[^>]*>/g, '');
+					textHistory.push({text: text});
+					if(defaultWords[i].double === true){ // if word is a double meaning
+						if(multMethod === "0"){ // if multiple meaning is selected to CENSOR, automatically sensors multiple meaning word regardless of contenx
+							text = text.replace(wordRegex, censorCharacter);
+							profanityCount++;
+							let temp = defaultWords.find(e => e.word === defaultWords[i].word);
+							temp.count+=1;
+							let tempDate = wordDates.find(e => e.date === currentDate);
+							// console.log(tempDate);
+							if(tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word); // if current date exists 
+								if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: defaultWords[i].word});
+									// console.log(tempWord);
+								}
+								else{tempWord.count+=1;
+									// console.log(tempWord);
+								}
+							}
+							else{wordDates.push({date: currentDate, wordHist:[{count: 1, word: defaultWords[i].word}]}) // Adds new date and new set of record
+								// console.log(wordDates);
+							}
+						}
+						else{
+							text = text.replace(wordRegex, censorCharacter);
+							profanityCount++;
+							let temp = defaultWords.find(e => e.word === defaultWords[i].word);
+							temp.count+=1;
+							let tempDate = wordDates.find(e => e.date === currentDate);
+							// console.log(tempDate);
+							if(tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word);
+								if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: defaultWords[i].word});
+									// console.log(tempWord);
+								}
+								else{tempWord.count+=1;
+									// console.log(tempWord);
+								}
+							}
+							else{wordDates.push({date: currentDate, wordHist:[{count: 1, word: defaultWords[i].word}]})
+								// console.log(wordDates);
+							}
+						}
+					}
+					else{
+						text = text.replace(wordRegex, censorCharacter);
+						profanityCount++;
+						let temp = defaultWords.find(e => e.word === defaultWords[i].word);
+						temp.count+=1;
+						let tempDate = wordDates.find(e => e.date === currentDate);
+						// console.log(tempDate);
+						if(tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word);
+							if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: defaultWords[i].word});
+								// console.log(tempWord);
+							}
+							else{tempWord.count+=1;
+								// console.log(tempWord);
+							}
+						}
+						else{wordDates.push({date: currentDate, wordHist:[{count: 1, word: defaultWords[i].word}]})
+							// console.log(wordDates);
+						}
+					}
+					
+					chrome.storage.sync.set({defaultWords,wordDates,textHistory},function(){});
 				}
 			}
 			
@@ -124,11 +234,50 @@ function replaceText(text){
 			for(var i = 0; i < substituteWords.length; i++){
 				var wordRegex = globalMatchMethods(matchMethod,substituteWords[i].word);
 				if(wordRegex.test(text) === true){
-					text = text.replace(wordRegex, substituteWords[i].substitute);
-					profanityCount++;
-					let temp = defaultWords.find(e => e.word === substituteWords[i].word);
-					chrome.storage.sync.set({defaultWords},function(){});
-				
+					text = text.replace(/<[^>]*>/g, '');
+					textHistory.push({text: text});	
+					if(substituteWords[i].double === true){
+						if(multMethod === "0"){
+							text = text.replace(wordRegex, substituteWords[i].substitute);
+							profanityCount++;
+							let temp = defaultWords.find(e => e.word === substituteWords[i].word);
+							temp.count+=1;		
+							let tempDate = wordDates.find(e => e.date === currentDate);
+							// console.log(tempDate);
+							if(tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === substituteWords[i].word);
+								if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: substituteWords[i].word});
+									// console.log(tempWord);
+								}
+								else{tempWord.count+=1;
+									// console.log(tempWord);
+								}
+							}
+							else{wordDates.push({date: currentDate, wordHist:[{count: 1, word: substituteWords[i].word}]})
+								// console.log(wordDates);
+							}				
+						}
+					}	
+					else{
+						
+						text = text.replace(wordRegex, substituteWords[i].substitute);
+						profanityCount++;
+						let temp = defaultWords.find(e => e.word === substituteWords[i].word);
+						temp.count+=1;
+						let tempDate = wordDates.find(e => e.date === currentDate);
+							// console.log(tempDate);
+							if(tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === substituteWords[i].word);
+								if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: substituteWords[i].word});
+									// console.log(tempWord);
+								}
+								else{tempWord.count+=1;
+									// console.log(tempWord);
+								}
+							}
+							else{wordDates.push({date: currentDate, wordHist:[{count: 1, word: substituteWords[i].word}]})
+								// console.log(wordDates);
+							}
+					}	
+					chrome.storage.sync.set({defaultWords,wordDates,textHistory},function(){});
 				}
 			}
 			
@@ -137,12 +286,71 @@ function replaceText(text){
 			for(var i = 0; i < defaultWords.length; i++){
 				var wordRegex = globalMatchMethods(matchMethod,defaultWords[i].word);
 				if(wordRegex.test(text) === true){
-					text = text.replace(wordRegex, "");
-					profanityCount++;
-					let temp = defaultWords.find(e => e.word === defaultWords[i].word);
-					temp.count+=1;
-					chrome.storage.sync.set({defaultWords},function(){});
-				
+					text = text.replace(/<[^>]*>/g, '');
+					textHistory.push({text: text});	
+					if(defaultWords[i].double === true){
+						if(multMethod === "0"){
+							text = text.replace(wordRegex, "");
+							profanityCount++;
+							let temp = defaultWords.find(e => e.word === defaultWords[i].word);
+							temp.count+=1;
+							let tempDate = wordDates.find(e => e.date === currentDate);
+							// console.log(tempDate);
+							if(tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word);
+								if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: defaultWords[i].word});
+									// console.log(tempWord);
+								}
+								else{tempWord.count+=1;
+									// console.log(tempWord);
+								}
+							}
+							else{wordDates.push({date: currentDate, wordHist:[{count: 1, word: defaultWords[i].word}]})
+								// console.log(wordDates);
+							}
+						}
+						else{
+							text = text.replace(wordRegex, censorCharacter);
+							profanityCount++;
+							let temp = defaultWords.find(e => e.word === defaultWords[i].word);
+							temp.count+=1;
+							let tempDate = wordDates.find(e => e.date === currentDate);
+							// console.log(tempDate);
+							if(tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word);
+								if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: defaultWords[i].word});
+									// console.log(tempWord);
+								}
+								else{tempWord.count+=1;
+									// console.log(tempWord);
+								}
+							}
+							else{wordDates.push({date: currentDate, wordHist:[{count: 1, word: defaultWords[i].word}]})
+								// console.log(wordDates);
+							}
+						}
+					}
+
+					else{
+						text = text.replace(/<[^>]*>/g, '');	
+						// addTxtHistory(text);
+						text = text.replace(wordRegex, "");
+						profanityCount++;
+						let temp = defaultWords.find(e => e.word === defaultWords[i].word);
+						temp.count+=1;
+						let tempDate = wordDates.find(e => e.date === currentDate);
+						// console.log(tempDate);
+						if(tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word);
+							if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: defaultWords[i].word});
+								// console.log(tempWord);
+							}
+							else{tempWord.count+=1;
+								// console.log(tempWord);
+							}
+						}
+						else{wordDates.push({date: currentDate, wordHist:[{count: 1, word: defaultWords[i].word}]})
+							// console.log(wordDates);
+						}
+					}
+					chrome.storage.sync.set({defaultWords,wordDates,textHistory},function(){});
 				}
 			}
 			
@@ -155,7 +363,6 @@ function replaceText(text){
 function checkWebsite(){
 	stringifyObject = JSON.stringify(websites);
 	regexpSite = new RegExp(origin_site);
-	console.log(origin_site);
 	for(var i = 0;i < websites.length; i++){
 		regexpSite = new RegExp(origin_site);
 
@@ -168,6 +375,7 @@ function checkWebsite(){
 					return retrieveCount.toString();
 			});
 			websites = JSON.parse(replaceObject);
+			// console.log(websites);
 			chrome.storage.sync.set({websites},function(){
 				websites.push(JSON.parse(replaceObject));
 			});
@@ -196,11 +404,13 @@ function addWebStatistics(site, profanityCount){
 
 function checkWarningDomain(){
 	var origin_site = document.location.origin;
+	var wordRegex;
 	chrome.storage.sync.get(['warningDomains'],function(result){
 		for(var i = 0; i < result.warningDomains.length; i++){
 			if(origin_site === result.warningDomains[i]){ // Check if site is a Warning domain
 				alert("Warning: This website contains a lot of profanity");
 			}
+
 		}
 	});
 }
@@ -232,7 +442,10 @@ function switchFilterMethods(filterMethod,text,element,wordRegex,node,word,defau
 function toggleFilter(){
 	if(filterToggle === true){
 		filterWords(xpathDocText);
+		checkWebsite();
+		checkWarningDomain();
 	}
+	mutationObserver();
 }
-checkWarningDomain();
+
 loadSettings();

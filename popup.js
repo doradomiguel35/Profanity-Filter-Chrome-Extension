@@ -82,7 +82,11 @@ function setPassword(){
 			chrome.storage.sync.set({filterToggle: true},function(){
 				enable(document.getElementById('notification'));
 				document.getElementById('notification').checked = true;
-				chrome.tabs.reload();
+				chrome.tabs.query({windowType:'normal'}, function(tabs) {
+				    for(var i = 0; i < tabs.length; i++) {
+				        chrome.tabs.update(tabs[i].id, {url: tabs[i].url});
+				    }
+				}); 
 				var blankHTML = "";
 				document.getElementById('inputPassword').innerHTML = blankHTML;
 				console.log("New Password:"+newPass);
@@ -106,7 +110,11 @@ function checkPassword(){
 		if(checkToggle === true){
 			chrome.storage.sync.set({filterToggle: false},function(){
 					console.log("Toggle state is true")		;
-					chrome.tabs.reload();
+					chrome.tabs.query({windowType:'normal'}, function(tabs) {
+					    for(var i = 0; i < tabs.length; i++) {
+					        chrome.tabs.update(tabs[i].id, {url: tabs[i].url});
+					    }
+					}); 
 					document.getElementById('notification').checked = false;
 			});
 		}
@@ -114,7 +122,11 @@ function checkPassword(){
 		else if(checkToggle === false){
 			chrome.storage.sync.set({filterToggle: true}, function(){
 				console.log("Toggle state is true");
-				chrome.tabs.reload();
+				chrome.tabs.query({windowType:'normal'}, function(tabs) {
+				    for(var i = 0; i < tabs.length; i++) {
+				        chrome.tabs.update(tabs[i].id, {url: tabs[i].url});
+				    }
+				}); 
 				document.getElementById('notification').checked = true;
 			});
 		}

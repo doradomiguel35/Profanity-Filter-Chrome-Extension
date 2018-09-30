@@ -11,7 +11,7 @@
 		    <span class="tablinks active">Settings</span>
 		    <span class="tablinks">Ranks</span>
 		    <span class="tablinks">Words</span>
-		    
+		    <span class="tablinks">History</span>
 		  </nav>
 		</div>
 
@@ -44,17 +44,22 @@
 			        <option value="mixed">mixed</option>
 			      </select>
 			</div>
-			<br>
+			<h4> Multiple Meaning </h4>
+			<select id="multipleMean">
+				<option value= 0> Censor </option>
+				<option value= 1> Ignore </option>
+			</select>
+			<br><br>
 			<button id="btnSave">Save</button>
 			<div id="saveNotif"></div>
 
 			<h4> Add/Remove Words </h4>
 			<input type="text" id="addWords" placeholder="Word">
-			<!-- <select id="doubleWord">
-				<option>--Double Meaning--</option>
+			<select id="doubleWord">
+				<option>--Multiple Meaning--</option>
 				<option value="true">True</option>
 				<option value="false">False</option>
-			</select><br> -->
+			</select><br>
 			<input type="text" id="substitute" placeholder="Word Substitute"><br>
 			<div id="addNotif"></div>
 			<button id="btnAdd">Add</button>
@@ -112,20 +117,61 @@
 			 </table>
 			</div>
 		</div>
-
+		
+		<!-- Words Tab -->
 		<div id="Words" class="tabcontent hidden">
-			<table id="wordCounts">
+			<select id="wordRankSelect"> 
+				<option value= 0> --Total Words -- </option>
+				<option value= 1> --Daily Words -- </option>
+			</select>
+			<br><br>
+			<div id="totalWords" style="display:block;">
+				<table id="wordCounts">
+					<thead>
+						<tr>
+							<th>Word</th>
+							<th>Count</th>
+						</tr>
+					</thead>
+					<tbody>
+						
+					</tbody>
+				</table>
+			</div>
+
+			<div id="dailyWords" style="display:none;">
+				<select id="dateSelect">
+					<option> --Choose Date-- </option>
+				</select>
+				<br>
+				<table id="loggedWords">
+					<thead>
+						<tr>
+							<th>Word</th>
+							<th>Count</th>
+						</tr>
+					</thead>
+					<tbody>
+						
+					</tbody>
+				</table>
+			</div>
+		</div>
+		
+		<!-- History Tab -->
+
+		<div id="History" class="tabcontent hidden">
+			<button id="clearHistory">Clear History</button>
+			<div id="notifHistory"></div>
+			<table id="history">
 				<thead>
 					<tr>
-						<th>Word</th>
-						<th>Count</th>
+						<th>History</th>
 					</tr>
 				</thead>
 				<tbody>
-					<td><div id="wordRank"></div></td>
-					<td><div id="wordCount"></div></td>
+					<td><div id="txtHistory"></div></td>
 				</tbody>
-			</table>
 		</div>
 		
 	</div>

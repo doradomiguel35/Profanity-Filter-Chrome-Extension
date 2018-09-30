@@ -1,16 +1,20 @@
-var settings = {
-	"censorCharacter": "****",
-	"filterMethod": 0,
-	"filterToggle": true,
-	"matchMethod": 0
-};
+var currentDate = new Date();
+var dd = currentDate.getDate();
+var mm = currentDate.getMonth()+1;
+var yy = currentDate.getFullYear();
 
-var eventCensorChar,eventMatchMethod,eventFilterMethod,htmlSite,htmlCount,htmldomain,htmlWord,htmlSubstitute;
+var eventCensorChar,eventWordRankSelect,eventMatchMethod,eventFilterMethod,eventMultipleMeanMethod,htmlSite,htmlCount,htmldomain,htmlWord,htmlSubstitute;
+
+// chrome.storage.sync.get(['wordDates'],function(date){
+// 	console.log(date.wordDates[0].wordHist[0].word);
+// });
 
 function retrieveSettings(){
-	chrome.storage.sync.get(settings, function(settings){
+	chrome.storage.sync.get(['filterMethod','matchMethod','censorCharacter','multipleMeaning','filterToggle'], function(settings){
+		console.log(settings);
 		var filterSelectCmb = document.getElementById('filterMethodSelect');
 		var filterMethodStorage = settings.filterMethod;
+		// console.log(filterMethodStorage);
 		switch(filterMethodStorage){
 			case "0":
 				filterSelectCmb.value = filterMethodStorage;
@@ -49,6 +53,18 @@ function retrieveSettings(){
 			case "mixed":
 				censorCharacterSelectCmb.value = censorCharacterSelectStorage;
 		}
+
+		var multipleMeaningSelectCmb = document.getElementById('multipleMean');
+		var multipleMeaningSelectStorage = settings.multipleMeaning;
+		console.log(multipleMeaningSelectStorage);
+		switch(multipleMeaningSelectStorage){
+			case "0":
+				multipleMeaningSelectCmb.value = multipleMeaningSelectStorage;
+				console.log(multipleMeaningSelectCmb.value);
+			case "1":
+				multipleMeaningSelectCmb.value = multipleMeaningSelectStorage;
+				console.log(multipleMeaningSelectCmb.value);
+		}	
 	});
 	
 	
@@ -58,59 +74,61 @@ function sortSites(){
 	chrome.storage.sync.get(['websites'],function(result){
 		chrome.storage.sync.get(['substituteWords'],function(sub){
 			chrome.storage.sync.get(['defaultWords'],function(words){
-				var sort_by = function(field, reverse, primer){
-				var key = primer ? 
-			       function(x) {return primer(x[field])} : 
-			       function(x) {return x[field]};
-					reverse = !reverse ? 1 : -1;
-					return function (a, b) {
-				       return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
-				     } 
-				}
-
-				// Sort website rank
-				var unsorted = result.websites;
-				for(var i = 0; i < result.websites.length; i++){
-					if(result.websites[i].count === "0"){
-						delete result.websites[i];
-						unsorted = result.websites;
-						unsorted = unsorted.filter(function(x){
-	  					return (x !== (undefined || null || ''));
-	  					});
-	  					console.log("Site deleted");
+				chrome.storage.sync.get(['wordDates'],function(date){
+					var sort_by = function(field, reverse, primer){
+					var key = primer ? 
+				       function(x) {return primer(x[field])} : 
+				       function(x) {return x[field]};
+						reverse = !reverse ? 1 : -1;
+						return function (a, b) {
+					       return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+					     } 
 					}
-				}
-				var websites = unsorted.sort(sort_by('count', true, parseInt));
-				
-				chrome.storage.sync.set({websites},function(){
-					console.log("Sites sorted");
-				});	
 
-				//Sort word rank
-				var unsorted_words = words.defaultWords;
-				var defaultWords = unsorted_words.sort(sort_by('count',true, parseInt));
+					// Sort website rank
+					var unsorted = result.websites;
+					for(var i = 0; i < result.websites.length; i++){
+						if(result.websites[i].count === "0"){
+							delete result.websites[i];
+							unsorted = result.websites;
+							unsorted = unsorted.filter(function(x){
+		  					return (x !== (undefined || null || ''));
+		  					});
+		  					console.log("Site deleted");
+						}
+					}
+					var websites = unsorted.sort(sort_by('count', true, parseInt));
+					
+					//Sort word rank
+					var unsorted_words = words.defaultWords;
+					var defaultWords = unsorted_words.sort(sort_by('count',true, parseInt));
 
-				chrome.storage.sync.set({defaultWords},function(){
-					console.log("Words sorted");
-				});
+					//Word List A-Z
+					var substituteWords = sub.substituteWords;
+					substituteWords = substituteWords.sort(function(a, b){
+						if(a.word > b.word) return 1;
+						if(a.word < b.word) return -1;
+						return 0;
+					});
 
-				//Word List A-Z
-				var substituteWords = sub.substituteWords;
-				substituteWords = substituteWords.sort(function(a, b){
-					if(a.word > b.word) return 1;
-					if(a.word < b.word) return -1;
-					return 0;
-				});
+					for(var i = 0; i < date.wordDates.length;i++){
+						var unsorted_date = date.wordDates[i].wordHist;
+						var wordDates = unsorted_date.sort(sort_by('count',true,parseInt));
+					}
+					wordDates = date.wordDates;
 
-				chrome.storage.sync.set({substituteWords},function(){
-					console.log("Words sorted");
+
+					chrome.storage.sync.set({defaultWords,substituteWords,websites,wordDates},function(){
+						console.log("Words sorted");});
 				});
 			});
 		});
 	});
+	populateDates()
 	populateWebsiteTable();
 	populateWordRankTable();
 	populateWordTable();
+	populateTextHistory();
 	populateWarningDomains();
 }
 
@@ -172,6 +190,46 @@ function populateWebsiteTable(){
 	}); 
 }
 
+function populateDates(){
+	var select = document.getElementById('dateSelect');
+	var option = document.createElement('option');
+	var options = [];
+	chrome.storage.sync.get(['wordDates'],function(date){
+		for(var i = 0; i < date.wordDates.length; i++){
+			console.log(date.wordDates[i].date);
+			option.text = option.value = date.wordDates[i].date;
+			options.push(option.outerHTML);
+		}
+		select.insertAdjacentHTML('beforeEnd', options.join('\n'));
+	});
+}
+
+function populateDailyWords(event){
+	var tb = document.getElementById('loggedWords');
+	console.log(tb);
+	while(tb.rows.length > 1) {tb.deleteRow(1);
+	  console.log("row deleted");
+	}
+	chrome.storage.sync.get(['wordDates'],function(words){
+		var table = document.getElementById('loggedWords');
+		var date = event.target.value;
+		var wordDates = words.wordDates;
+		var index = wordDates.findIndex(x => x.date === date);
+
+		for(var i = 0 ; i < wordDates[index].wordHist.length; i++){
+			var words = wordDates[index].wordHist[i];
+			var row = document.createElement('tr');
+			var properties = ['word','count'];
+			for(var k = 0; k < properties.length; k++){
+				var cell = document.createElement('td');
+				cell.innerHTML = words[properties[k]];
+				row.appendChild(cell);
+			}
+			table.appendChild(row);
+		}
+	});
+}
+
 function populateWarningDomains(){
 	var select = document.getElementById('domainSelect');
 	var option = document.createElement('option');
@@ -184,7 +242,41 @@ function populateWarningDomains(){
 		}
 		select.insertAdjacentHTML('beforeEnd', options.join('\n'));
 	});
+}
 
+function populateTextHistory(){
+	var table = document.getElementById('history');
+	chrome.storage.sync.get(['textHistory'],function(hist){
+		for(var i = 0; i < hist.textHistory.length ; i++){
+			var history = hist.textHistory[i];
+			var row = document.createElement('tr');
+			var properties = ['text'];
+
+			for(var k = 0; k < properties.length; k++){
+				var cell = document.createElement('td');
+				cell.innerHTML = history[properties[k]];
+				row.appendChild(cell);
+			}
+			table.appendChild(row);
+		}	
+	});
+}
+
+function wordRankSelect(event){
+	eventWordRankSelect = event.target.value; 
+	if(eventWordRankSelect === "0"){
+		document.getElementById('totalWords').style.display = "block";
+		document.getElementById('dailyWords').style.display = "none";
+	}
+	else if(eventWordRankSelect === "1"){
+		document.getElementById('totalWords').style.display = "none";
+		document.getElementById('dailyWords').style.display = "block";
+	}
+
+}
+
+function multipleMeaningSelect(event){
+	eventMultipleMeanMethod = event.target.value;
 }
 
 function filterMethodSelect(event){
@@ -211,11 +303,18 @@ function saveSettings(){
 		"censorCharacter": eventCensorChar,
 		"filterMethod": eventFilterMethod,
 		"matchMethod": eventMatchMethod,
+		"multipleMeaning": eventMultipleMeanMethod
 	}
 
 	chrome.storage.sync.set(saveSettings,function(){
 		var htmlSave = "Settings saved";
 		document.getElementById('saveNotif').innerHTML = htmlSave;
+		// chrome.tabs.reload();
+		chrome.tabs.query({windowType:'normal'}, function(tabs) {
+		    for(var i = 0; i < tabs.length; i++) {
+		        chrome.tabs.update(tabs[i].id, {url: tabs[i].url});
+		    }
+		}); 
 	});
 	
 }
@@ -240,8 +339,9 @@ function addDomain(event){
 			chrome.storage.sync.set({warningDomains},function(result){
 				htmlNotif ='Warning domain added';
 				document.getElementById('addNotif').innerHTML = htmlNotif;
-				chrome.tabs.reload();
 			});
+			sortSites();
+			chrome.tabs.reload();
 		}
 	});
 }
@@ -277,6 +377,7 @@ function removeDomain(event){
 function addWord(event){
 	var word = document.getElementById('addWords').value;
 	var substitute = document.getElementById('substitute').value;
+	var double = document.getElementById('doubleWord').value;
 	var regExpWord = new RegExp("\\b"+word+"\\b",'i');
 	var stringifyWord;
 	var defaultWords;
@@ -294,16 +395,21 @@ function addWord(event){
 				document.getElementById('addNotif').innerHTML = htmlNotif;
 			}
 
+			else if(word === "" || substitute === "" || double === "--Multiple Meaning--"){
+				htmlNotif = "Specify word, substitute and identify if it has multiple meanings";
+				document.getElementById('addNotif').innerHTML = htmlNotif;
+			}
+
 			else{
-				defaultWords.push({"count": 0, "word": word});
-				substituteWords.push({"substitute": "["+substitute+"]","word": word});
+				defaultWords.push({"count": 0, "word": word, "double":double});
+				substituteWords.push({"substitute": "["+substitute+"]","word": word, "double": double});
 				console.log(substituteWords);
-				chrome.storage.sync.set({defaultWords},function(){
-					chrome.storage.sync.set({substituteWords},function(){
-						htmlNotif = "Word added";
-						document.getElementById('addNotif').innerHTML = htmlNotif;
-					});
+				chrome.storage.sync.set({defaultWords,substituteWords},function(){
+					htmlNotif = "Word added";
+					document.getElementById('addNotif').innerHTML = htmlNotif;
 				});
+
+				sortSites();
 				chrome.tabs.reload();
 
 			}
@@ -339,6 +445,7 @@ function removeWord(event){
 								chrome.storage.sync.set({substituteWords},function(){
 									htmlNotif = "Word removed";
 									document.getElementById('removeNotif').innerHTML = htmlNotif;
+									sortSites();
 									chrome.tabs.reload();
 								});
 							});
@@ -353,6 +460,15 @@ function removeWord(event){
   			}	
   		});
 	});
+}
+
+function clearHistory(event){
+	var textHistory = [];
+	chrome.storage.sync.set({textHistory},function(){
+		var html = "History Cleared"
+		document.getElementById('notifHistory').innerHTML = html;
+	});
+	chrome.tabs.reload();
 }
 
 function openTab(event) {
@@ -392,9 +508,15 @@ var tabs = document.getElementsByClassName('tablinks');
 for (var i = 0; i < tabs.length; i++) {
   tabs[i].addEventListener('click', function(e) { openTab(e); });
 }
+
 sortSites();
 retrieveSettings();
-//Listeners   
+
+//Listeners 
+document.getElementById('dateSelect').addEventListener('change',populateDailyWords);
+document.getElementById('wordRankSelect').addEventListener('change',wordRankSelect);
+document.getElementById('clearHistory').addEventListener('click',clearHistory); 
+document.getElementById('multipleMean').addEventListener('change',multipleMeaningSelect);
 document.getElementById('btnRemove').addEventListener('click',removeWord);
 document.getElementById('btnAdd').addEventListener('click',addWord);
 document.getElementById('domainRemove').addEventListener('click',removeDomain);
