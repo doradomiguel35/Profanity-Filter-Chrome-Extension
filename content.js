@@ -173,12 +173,7 @@ function replaceText(text){
 							temp.count+=1;
 							let tempDate = wordDates.find(e => e.date === currentDate);
 							// console.log(tempDate);
-							if( tempDate.date === undefined || tempDate.date != currentDate){
-								wordDates.push({date: currentDate, wordHist:[{count: 1, word: defaultWords[i].word}]}) // Adds new date and new set of records
-								// console.log(wordDates);
-							}
-
-							else{let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word); // if current date exists 
+							if(tempDate != undefined || tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word); // if current date exists 
 								if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: defaultWords[i].word});
 									// console.log(tempWord);
 								}
@@ -186,7 +181,9 @@ function replaceText(text){
 									// console.log(tempWord);
 								}
 							}
-							
+							else{wordDates.push({date: currentDate, wordHist:[{count: 1, word: defaultWords[i].word}]}) // Adds new date and new set of records
+								// console.log(wordDates);
+							}
 						}
 						else{
 							text = text.replace(wordRegex, censorCharacter);
@@ -195,7 +192,7 @@ function replaceText(text){
 							temp.count+=1;
 							let tempDate = wordDates.find(e => e.date === currentDate);
 							// console.log(tempDate);
-							if(tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word);
+							if(tempDate != undefined || tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word);
 								if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: defaultWords[i].word});
 									// console.log(tempWord);
 								}
@@ -215,7 +212,7 @@ function replaceText(text){
 						temp.count+=1;
 						let tempDate = wordDates.find(e => e.date === currentDate);
 						// console.log(tempDate);
-						if(tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word);
+						if(tempDate != undefined || tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word);
 							if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: defaultWords[i].word});
 								// console.log(tempWord);
 							}
@@ -247,7 +244,7 @@ function replaceText(text){
 							temp.count+=1;		
 							let tempDate = wordDates.find(e => e.date === currentDate);
 							// console.log(tempDate);
-							if(tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === substituteWords[i].word);
+							if(tempDate != undefined || tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === substituteWords[i].word);
 								if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: substituteWords[i].word});
 									// console.log(tempWord);
 								}
@@ -268,7 +265,7 @@ function replaceText(text){
 						temp.count+=1;
 						let tempDate = wordDates.find(e => e.date === currentDate);
 							// console.log(tempDate);
-							if(tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === substituteWords[i].word);
+							if(tempDate != undefined || tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === substituteWords[i].word);
 								if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: substituteWords[i].word});
 									// console.log(tempWord);
 								}
@@ -299,7 +296,7 @@ function replaceText(text){
 							temp.count+=1;
 							let tempDate = wordDates.find(e => e.date === currentDate);
 							// console.log(tempDate);
-							if(tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word);
+							if(tempDate != undefined || tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word);
 								if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: defaultWords[i].word});
 									// console.log(tempWord);
 								}
@@ -318,7 +315,7 @@ function replaceText(text){
 							temp.count+=1;
 							let tempDate = wordDates.find(e => e.date === currentDate);
 							// console.log(tempDate);
-							if(tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word);
+							if(tempDate != undefined || tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word);
 								if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: defaultWords[i].word});
 									// console.log(tempWord);
 								}
@@ -341,7 +338,7 @@ function replaceText(text){
 						temp.count+=1;
 						let tempDate = wordDates.find(e => e.date === currentDate);
 						// console.log(tempDate);
-						if(tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word);
+						if(tempDate != undefined || tempDate.date === currentDate){let tempWord = tempDate.wordHist.find(e => e.word === defaultWords[i].word);
 							if(tempWord === undefined){tempDate.wordHist.push({count: 1, word: defaultWords[i].word});
 								// console.log(tempWord);
 							}
