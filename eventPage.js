@@ -1,3 +1,10 @@
+var currentDate = new Date();
+var dd = currentDate.getDate();
+var mm = currentDate.getMonth()+1;
+var yy = currentDate.getFullYear();
+if(dd<10) {dd = '0'+dd} 
+if(mm<10) {mm = '0'+mm}
+currentDate = (mm)+ "/"+ dd + "/" + yy;
 chrome.runtime.onInstalled.addListener(function(details){
     var defaultSettings = {
 		censorCharacter: "****",
@@ -46,9 +53,9 @@ chrome.runtime.onInstalled.addListener(function(details){
 			{"count": 0,"word": "anal","double":false},
 			{"count": 0,"word": "bastard","double":false},
 			{"count": 0,"word": "blowjob","double":false},
-			{"count": 0,"word": "bampot""double":false},
+			{"count": 0,"word": "bampot","double":false},
 			{"count": 0,"word": "bitchass","double":false},
-			{"count": 0,"word": "bitchy""double":false},
+			{"count": 0,"word": "bitchy","double":false},
 			{"count": 0,"word": "bullshit","double":false},
 			{"count": 0,"word": "bitch","double":true},
 			{"count": 0,"word": "cunt","double":false},
@@ -225,7 +232,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 			{"substitute": "[pathetic]","word": "whore","double":false}
 		],
 		textHistory: [],
-		wordDates:[];
+		wordDates:[{date: currentDate, wordHist: []}]	
 	}
 
     if(details.reason == "install"){
