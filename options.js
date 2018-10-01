@@ -5,12 +5,8 @@ var yy = currentDate.getFullYear();
 
 var eventCensorChar,eventWordRankSelect,eventMatchMethod,eventFilterMethod,eventMultipleMeanMethod,htmlSite,htmlCount,htmldomain,htmlWord,htmlSubstitute;
 
-// chrome.storage.sync.get(['wordDates'],function(date){
-// 	console.log(date.wordDates[0].wordHist[0].word);
-// });
-
 function retrieveSettings(){
-	chrome.storage.sync.get(['filterMethod','matchMethod','censorCharacter','multipleMeaning','filterToggle'], function(settings){
+	chrome.storage.local.get(['filterMethod','matchMethod','censorCharacter','multipleMeaning','filterToggle'], function(settings){
 		console.log(settings);
 		var filterSelectCmb = document.getElementById('filterMethodSelect');
 		var filterMethodStorage = settings.filterMethod;
@@ -71,10 +67,10 @@ function retrieveSettings(){
 }
 
 function sortSites(){
-	chrome.storage.sync.get(['websites'],function(result){
-		chrome.storage.sync.get(['substituteWords'],function(sub){
-			chrome.storage.sync.get(['defaultWords'],function(words){
-				chrome.storage.sync.get(['wordDates'],function(date){
+	chrome.storage.local.get(['websites'],function(result){
+		chrome.storage.local.get(['substituteWords'],function(sub){
+			chrome.storage.local.get(['defaultWords'],function(words){
+				chrome.storage.local.get(['wordDates'],function(date){
 					var sort_by = function(field, reverse, primer){
 					var key = primer ? 
 				       function(x) {return primer(x[field])} : 
@@ -118,7 +114,7 @@ function sortSites(){
 					wordDates = date.wordDates;
 
 
-					chrome.storage.sync.set({defaultWords,substituteWords,websites,wordDates},function(){
+					chrome.storage.local.set({defaultWords,substituteWords,websites,wordDates},function(){
 						console.log("Words sorted");});
 				});
 			});
@@ -133,7 +129,7 @@ function sortSites(){
 }
 
 function populateWordRankTable(){
-	chrome.storage.sync.get(['defaultWords'],function(result){
+	chrome.storage.local.get(['defaultWords'],function(result){
 		var table = document.getElementById('wordCounts');
 
 		for(var i = 0 ; i < result.defaultWords.length ; i++){
@@ -152,7 +148,7 @@ function populateWordRankTable(){
 }
 
 function populateWordTable(){
-	chrome.storage.sync.get(['substituteWords'],function(sub){
+	chrome.storage.local.get(['substituteWords'],function(sub){
 		var table = document.getElementById('wordAndSubstitute');
 
 		for(var i = 0; i < sub.substituteWords.length ; i++){
@@ -172,7 +168,7 @@ function populateWordTable(){
 }
 
 function populateWebsiteTable(){
-	chrome.storage.sync.get(['websites'],function(result){
+	chrome.storage.local.get(['websites'],function(result){
 		var table = document.getElementById('siteAndCount');
 		
 		for(var i = 0; i < result.websites.length ; i++){
@@ -194,7 +190,7 @@ function populateDates(){
 	var select = document.getElementById('dateSelect');
 	var option = document.createElement('option');
 	var options = [];
-	chrome.storage.sync.get(['wordDates'],function(date){
+	chrome.storage.local.get(['wordDates'],function(date){
 		for(var i = 0; i < date.wordDates.length; i++){
 			console.log(date.wordDates[i].date);
 			option.text = option.value = date.wordDates[i].date;
@@ -210,7 +206,7 @@ function populateDailyWords(event){
 	while(tb.rows.length > 1) {tb.deleteRow(1);
 	  console.log("row deleted");
 	}
-	chrome.storage.sync.get(['wordDates'],function(words){
+	chrome.storage.local.get(['wordDates'],function(words){
 		var table = document.getElementById('loggedWords');
 		var date = event.target.value;
 		var wordDates = words.wordDates;
@@ -234,7 +230,7 @@ function populateWarningDomains(){
 	var select = document.getElementById('domainSelect');
 	var option = document.createElement('option');
 	var options = [];
-	chrome.storage.sync.get(['warningDomains'],function(domain){
+	chrome.storage.local.get(['warningDomains'],function(domain){
 		for(var i = 0 ; i < domain.warningDomains.length ; i++){
 			console.log(domain.warningDomains[i]);
 			option.text = option.value = domain.warningDomains[i];
@@ -246,7 +242,7 @@ function populateWarningDomains(){
 
 function populateTextHistory(){
 	var table = document.getElementById('history');
-	chrome.storage.sync.get(['textHistory'],function(hist){
+	chrome.storage.local.get(['textHistory'],function(hist){
 		for(var i = 0; i < hist.textHistory.length ; i++){
 			var history = hist.textHistory[i];
 			var row = document.createElement('tr');
@@ -284,7 +280,7 @@ function filterMethodSelect(event){
 }
 
 function filterMethod(){
-  chrome.storage.sync.get(['filterMethod'], function(word){
+  chrome.storage.local.get(['filterMethod'], function(word){
       console.log(word.filterMethod);
   });
 }
@@ -306,7 +302,7 @@ function saveSettings(){
 		"multipleMeaning": eventMultipleMeanMethod
 	}
 
-	chrome.storage.sync.set(saveSettings,function(){
+	chrome.storage.local.set(saveSettings,function(){
 		var htmlSave = "Settings saved";
 		document.getElementById('saveNotif').innerHTML = htmlSave;
 		// chrome.tabs.reload();
@@ -325,7 +321,7 @@ function addDomain(event){
 	var warningDomains;
 	var stringifyDomains;
 	var htmlNotif;
-	chrome.storage.sync.get(['warningDomains'],function(domains){
+	chrome.storage.local.get(['warningDomains'],function(domains){
 		warningDomains = domains.warningDomains;
 		stringifyDomains = JSON.stringify(warningDomains);
 		if(regexpDomain.test(stringifyDomains) === true){
@@ -336,7 +332,7 @@ function addDomain(event){
 
 		else{
 			warningDomains.push(domain);
-			chrome.storage.sync.set({warningDomains},function(result){
+			chrome.storage.local.set({warningDomains},function(result){
 				htmlNotif ='Warning domain added';
 				document.getElementById('addNotif').innerHTML = htmlNotif;
 			});
@@ -350,7 +346,7 @@ function removeDomain(event){
 	var selectDomain = document.getElementById('domainSelect').value;
 	var warningDomains;
 	var htmlNotif;
-	chrome.storage.sync.get(['warningDomains'],function(domain){
+	chrome.storage.local.get(['warningDomains'],function(domain){
 		for(var i = 0;i < domain.warningDomains.length;i++){
 			if(selectDomain === domain.warningDomains[i]){
 				delete domain.warningDomains[i];
@@ -359,7 +355,7 @@ function removeDomain(event){
   					return (x !== (undefined || null || ''));
   				});
 				console.log(JSON.stringify(warningDomains));
-				chrome.storage.sync.set({warningDomains},function(){
+				chrome.storage.local.set({warningDomains},function(){
 					htmlNotif = "Warning domain removed";
 					document.getElementById('notifRemove').innerHTML = htmlNotif;
 					chrome.tabs.reload();
@@ -383,8 +379,8 @@ function addWord(event){
 	var defaultWords;
 	var substituteWords;
 	var htmlNotif;
-	chrome.storage.sync.get(['defaultWords'],function(result){
-		chrome.storage.sync.get(['substituteWords'],function(sub){
+	chrome.storage.local.get(['defaultWords'],function(result){
+		chrome.storage.local.get(['substituteWords'],function(sub){
 			defaultWords = result.defaultWords;
 			substituteWords = sub.substituteWords;
 
@@ -404,7 +400,7 @@ function addWord(event){
 				defaultWords.push({"count": 0, "word": word, "double":double});
 				substituteWords.push({"substitute": "["+substitute+"]","word": word, "double": double});
 				console.log(substituteWords);
-				chrome.storage.sync.set({defaultWords,substituteWords},function(){
+				chrome.storage.local.set({defaultWords,substituteWords},function(){
 					htmlNotif = "Word added";
 					document.getElementById('addNotif').innerHTML = htmlNotif;
 				});
@@ -423,8 +419,8 @@ function removeWord(event){
 	var defaultWords;
 	var substituteWords;
 	var htmlNotif;
-	chrome.storage.sync.get(['defaultWords'],function(result){
-		chrome.storage.sync.get(['substituteWords'],function(sub){
+	chrome.storage.local.get(['defaultWords'],function(result){
+		chrome.storage.local.get(['substituteWords'],function(sub){
 			for(var i = 0; i < result.defaultWords.length; i++){
 				if(selectWord === result.defaultWords[i].word){
 					delete result.defaultWords[i];
@@ -441,8 +437,8 @@ function removeWord(event){
 							return (x !== (undefined || null || ''));
 							});
 
-							chrome.storage.sync.set({defaultWords},function(){
-								chrome.storage.sync.set({substituteWords},function(){
+							chrome.storage.local.set({defaultWords},function(){
+								chrome.storage.local.set({substituteWords},function(){
 									htmlNotif = "Word removed";
 									document.getElementById('removeNotif').innerHTML = htmlNotif;
 									sortSites();
@@ -464,7 +460,7 @@ function removeWord(event){
 
 function clearHistory(event){
 	var textHistory = [];
-	chrome.storage.sync.set({textHistory},function(){
+	chrome.storage.local.set({textHistory},function(){
 		var html = "History Cleared"
 		document.getElementById('notifHistory').innerHTML = html;
 	});
