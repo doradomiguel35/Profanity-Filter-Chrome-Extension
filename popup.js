@@ -3,8 +3,8 @@ console.log("popup.js loaded");
 
 function toggleFilter(event){
 	var toggleFilterchecked = document.getElementById('notification').checked;
-	chrome.storage.sync.get(['password'],function(pass){
-		chrome.storage.sync.get(['filterToggle'],function(toggle){
+	chrome.storage.local.get(['password'],function(pass){
+		chrome.storage.local.get(['filterToggle'],function(toggle){
 			passwordProperty = pass.password;
 			if(passwordProperty ===  "null"){
 				disable(document.getElementById('notification'));
@@ -47,7 +47,7 @@ function toggleFilter(event){
 	
 function runTimer() {
 	var switchState = document.getElementById("notification").checked;
-    chrome.storage.sync.set({
+    chrome.storage.local.set({
         'value' : switchState
     }, function () {
         console.log("Switch Saved as " + switchState);
@@ -56,7 +56,7 @@ function runTimer() {
 }
 
 function restoreOptions() {
-    chrome.storage.sync.get({
+    chrome.storage.local.get({
         filterToggle: false
     }, function (items) {
         document.getElementById('notification').checked = items.filterToggle;
@@ -78,8 +78,8 @@ function setPassword(){
 	var newPass = document.getElementById('newPass').value;
 	var confirmPass = document.getElementById('confirmPass').value;
 	if(newPass === confirmPass){
-		chrome.storage.sync.set({password:newPass},function(){
-			chrome.storage.sync.set({filterToggle: true},function(){
+		chrome.storage.local.set({password:newPass},function(){
+			chrome.storage.local.set({filterToggle: true},function(){
 				enable(document.getElementById('notification'));
 				document.getElementById('notification').checked = true;
 				chrome.tabs.query({windowType:'normal'}, function(tabs) {
@@ -108,7 +108,7 @@ function checkPassword(){
 		document.getElementById('inputPassword').innerHTML = '<div id="inputPassword"></div>';
 		
 		if(checkToggle === true){
-			chrome.storage.sync.set({filterToggle: false},function(){
+			chrome.storage.local.set({filterToggle: false},function(){
 					console.log("Toggle state is true")		;
 					chrome.tabs.query({windowType:'normal'}, function(tabs) {
 					    for(var i = 0; i < tabs.length; i++) {
@@ -120,7 +120,7 @@ function checkPassword(){
 		}
 
 		else if(checkToggle === false){
-			chrome.storage.sync.set({filterToggle: true}, function(){
+			chrome.storage.local.set({filterToggle: true}, function(){
 				console.log("Toggle state is true");
 				chrome.tabs.query({windowType:'normal'}, function(tabs) {
 				    for(var i = 0; i < tabs.length; i++) {
@@ -140,7 +140,7 @@ function checkPassword(){
 
 function optionPassword(event){
 	var optionPass = document.getElementById('passOption').value;
-	chrome.storage.sync.get(['password'],function(pass){
+	chrome.storage.local.get(['password'],function(pass){
 		if(optionPass === pass.password){
 			chrome.runtime.openOptionsPage(); 
 		}
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.getElementById('options').addEventListener('click', function() {
 	var html;
-	chrome.storage.sync.get(['password'],function(pass){
+	chrome.storage.local.get(['password'],function(pass){
 		if(pass.password === "null"){
 			html = '<h4> Click the toggle to set password</h4>';
 			document.getElementById('optionsPassword').innerHTML = html;
