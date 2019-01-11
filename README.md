@@ -7,7 +7,12 @@
 * Daily record of most words filtered
 * Allows to setup warning domains
 
-# Installation
+# Installation (Shortcut)
+1. Go to https://chrome.google.com/webstore/detail/unseeit/fgknebogkkibiognoekbojeeifhidaao
+2. (Straight forward) Add to Chrome
+3. Voila! 
+
+# Installation (Development)
 1. Clone repository 
 2. Open Chrome
 3. Go to chrome://extensions/
