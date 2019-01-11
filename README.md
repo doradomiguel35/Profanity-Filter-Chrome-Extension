@@ -17,6 +17,9 @@
 2. Open Chrome
 3. Go to chrome://extensions/
 4. Toggle on Developer Mode
+5. Click "Load unpacked"
+6. Load cloned repository
+7. Contribute!
 
 
 
