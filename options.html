@@ -2,10 +2,9 @@
 <html>
 <head>
 	<title>UnseeIt v1.0</title>
-	<link rel="stylesheet" type="text/css" href="options.css">
-	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script> -->
+	<link rel="stylesheet" type="text/css" href="assets/css/options.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/button.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/input.css">
 </head>
 <body>
 	<div id="main" class="visible">
@@ -23,62 +22,61 @@
 
 		 <!-- Settings Tab -->
 		<div id="Settings" class="tabcontent visible">
-			<h4>Filter Method</h4>
-			
-			<div class="dropdown">
-				<select id="filterMethodSelect" name ="filter-methods">
-					<option value= 0>Censor</option>
-					<option value= 1>Substitute</option>
-					<option value= 2>Remove</option>
+			<div style="display: inline-block;">
+				<h4>Filter Method</h4>
+				
+				<div class="dropdown">
+					<select id="filterMethodSelect" name ="filter-methods" class="setOption">
+						<option value= 0>Censor</option>
+						<option value= 1>Substitute</option>
+						<option value= 2>Remove</option>
+					</select>
+				</div>
+				
+				<h4> Match Method </h4>
+				<select id="matchMethodSelect" name = "match-methods" class="setOption"> 
+					<option value= 0>Whole Word</option>
+					<option value= 1>Per Word</option>
 				</select>
 			</div>
-
-			<h4> Match Method </h4>
-			<select id="matchMethodSelect" name = "match-methods"> 
-				<option value= 0>Whole Word</option>
-				<option value= 1>Per Word</option>
-			</select>
-
-			<div id="optionsCensor" class="moveDown hidden">
-			    <h4>Censor character:</h4>
-			      <select id="censorCharacterSelect" class="small" name = "censorCharacters">
-			        <option value="****">*</option>
-			        <option value="&&&&">&amp;</option>
-			        <option value="$$$$">$</option>
-			        <option value="####">#</option>
-			        <option value="@@@@">@</option>
-			        <option value="^^^^">^</option>
-			        <option value="----">-</option>
-			        <option value="____">_</option>
-			        <option value="mixed">mixed</option>
-			      </select>
-			</div>
-			<h4> Multiple Meaning </h4>
-			<select id="multipleMean">
-				<option value= 0> Censor </option>
-				<option value= 1> Ignore </option>
-			</select>
+				<div id="optionsCensor" class="moveDown hidden">
+				    <h4>Censor character:</h4>
+				      <select id="censorCharacterSelect" class="small" name="censorCharacters" class="setOption">
+				        <option value="****">*</option>
+				        <option value="&&&&">&amp;</option>
+				        <option value="$$$$">$</option>
+				        <option value="####">#</option>
+				        <option value="@@@@">@</option>
+				        <option value="^^^^">^</option>
+				        <option value="----">-</option>
+				        <option value="____">_</option>
+				        <option value="mixed">mixed</option>
+				      </select>
+				</div>
+				<h4> Multiple Meaning </h4>
+				<select id="multipleMean" class="setOption">
+					<option value= 0> Censor </option>
+					<option value= 1> Ignore </option>
+				</select>
+			
 			<br><br>
-			<button id="btnSave">Save</button>
+			<button id="btnSave" class="myButton">Save</button>
 			<div id="saveNotif"></div>
-
+			<br><br><br><br>
 			<h4> Add/Remove Words </h4>
-			<input type="text" id="addWords" placeholder="Word">
+			<input type="text" id="addWords" placeholder="Add Word" class="setWord">
 			<select id="doubleWord">
 				<option>--Multiple Meaning--</option>
 				<option value="true">True</option>
 				<option value="false">False</option>
-			</select><br><br>
+			</select><br>
 			<div style="display: inline-block;">
-				<input type="text" id="substitute" placeholder="Word Substitute"><br>
-				<button id="btnAdd" class="myButton">Add</button>
+				<input type="text" id="substitute" placeholder="Word Substitute" class="setWord wordSubstitute">
+				<button id="btnAdd" class="myButton add">Add</button>
 			</div>
+			<div id="addNotif"></div>
 			<br><br>
-			<input type="text" id="removeWord" placeholder="Word">
-			 <!-- <div class="Input">
-			    <input type="text" id="removeWord" class="Input-text" placeholder="Word">
-			    <label for="removeWord" class="Input-label">Word</label>
-			  </div> -->
+			<input type="text" id="removeWord" placeholder="Remove Word" class="setWord">
 			<button id="btnRemove" class="myButton">Remove</button><br>
 			<div id="removeNotif"></div>
 			<br>
@@ -173,6 +171,7 @@
 		<!-- History Tab -->
 
 		<div id="Logs" class="tabcontent hidden">
+
 			<button id="clearHistory" class="myButton">Clear Logs</button>
 			<div id="notifHistory"></div>
 			<table id="history" style="table-layout:fixed; width:350px;word-break:break-all;">
@@ -187,6 +186,6 @@
 		</div>
 		
 	</div>
-<script type="text/javascript" src="options.js"></script>
+<script type="text/javascript" src="assets/js/options.js"></script>
 </body>
 </html>

@@ -1,4 +1,5 @@
 var passwordProperty;
+var newPass,confirmPass,storageNewPass,offPass,storageExPass;
 console.log("popup.js loaded");
 
 function toggleFilter(event){
@@ -16,6 +17,13 @@ function toggleFilter(event){
 				html+= '<br>';
 				html+= '<button id="storageNewPass">Set Password</button>';
 				document.getElementById('inputPassword').innerHTML = html;
+				// newPass = document.getElementById('newPass');
+				// confirmPass = document.getElementById('confirmPass');
+				// storageNewPass = document.getElementById('storageNewPass');
+				// newPass.classList.add('pass');
+				// confirmPass.classList.add('pass');
+				// storageNewPass.classList.add('myButton');
+
 				document.getElementById('storageNewPass').addEventListener('click',setPassword);
 			}
 
@@ -168,10 +176,10 @@ document.getElementById('options').addEventListener('click', function() {
 
 		else{
 			html = '<h4> Please Enter Password </h4>';
-			html+= '<input type="password" id="passOption"/>';
+			html+= '<input type="password" id="passOption" class="pass"/>';
 			html+= '<div id="loginStatus"></div>';
 			html+= '<br>';
-			html+= '<button id="optionPass">Enter Password</button>';
+			html+= '<button id="optionPass" class="myButton">Enter Password</button>';
 			html+= '<div id="optionNotif"></div>';
 			document.getElementById('optionsPassword').innerHTML = html;
 			document.getElementById('optionPass').addEventListener('click',optionPassword);

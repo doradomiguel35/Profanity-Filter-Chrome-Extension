@@ -386,13 +386,13 @@ function addWord(event){
 
 			stringifyWord = JSON.stringify(defaultWords);
 
-			if(regExpWord.test(stringifyWord) === true){
-				htmlNotif = "Word already added";
+			if(word === "" || substitute === "" || double === "--Multiple Meaning--"){
+				htmlNotif = "Specify word and its substitute word and identify if it has multiple meanings";
 				document.getElementById('addNotif').innerHTML = htmlNotif;
 			}
 
-			else if(word === "" || substitute === "" || double === "--Multiple Meaning--"){
-				htmlNotif = "Specify word, substitute and identify if it has multiple meanings";
+			else if(regExpWord.test(stringifyWord) === true){
+				htmlNotif = "Word already added";
 				document.getElementById('addNotif').innerHTML = htmlNotif;
 			}
 
@@ -422,7 +422,12 @@ function removeWord(event){
 	chrome.storage.local.get(['defaultWords'],function(result){
 		chrome.storage.local.get(['substituteWords'],function(sub){
 			for(var i = 0; i < result.defaultWords.length; i++){
-				if(selectWord === result.defaultWords[i].word){
+				if(selectWord === ""){
+					htmlNotif = "Type a word from the dictionary to remove!";
+					document.getElementById('removeNotif').innerHTML = htmlNotif;
+				}
+
+				else if(selectWord === result.defaultWords[i].word){
 					delete result.defaultWords[i];
 					defaultWords = result.defaultWords;
 					defaultWords = defaultWords.filter(function(x){
