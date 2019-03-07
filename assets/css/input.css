@@ -1,4 +1,4 @@
-input[type=text], select {
+input[type=text], select, input[type=password] {
   padding: 4px 4px;
   margin: 4px 0;
   display: inline-block;
@@ -17,5 +17,5 @@ input[type=text], select {
 }
 
 .pass{
-	widows: 100px;
+	width: 100px;
 }

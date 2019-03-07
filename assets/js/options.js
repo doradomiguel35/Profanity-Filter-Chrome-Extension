@@ -293,8 +293,7 @@ function matchMethodSelect(event){
 	eventMatchMethod = event.target.value
 }
 
-function saveSettings(){
-	
+function saveSettings(event){
 	var saveSettings = {
 		"censorCharacter": eventCensorChar,
 		"filterMethod": eventFilterMethod,
