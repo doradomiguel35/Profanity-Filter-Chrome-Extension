@@ -37,7 +37,8 @@
         "activeTab",
         "storage",
         "unlimitedStorage",
-        "tabs"
+        "tabs",
+        "https://ajax.googleapis.com/"
      ],
     "incognito": "split"
  }

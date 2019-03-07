@@ -236,7 +236,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 	}
 
     if(details.reason == "install"){
-       chrome.storage.sync.set(defaultSettings, function() {
+       chrome.storage.local.set(defaultSettings, function() {
       	alert("Extension successfully installed");
     });
     }
