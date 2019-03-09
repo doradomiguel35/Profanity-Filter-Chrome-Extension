@@ -2,7 +2,9 @@
 <html>
 <head>
 	<title>UnseeIt v1.0</title>
-	<link rel="stylesheet" type="text/css" href="options.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/options.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/button.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/input.css">
 </head>
 <body>
 	<div id="main" class="visible">
@@ -10,62 +12,72 @@
 		  <nav>
 		    <span class="tablinks active">Settings</span>
 		    <span class="tablinks">Ranks</span>
+		  </nav>
+		  <nav>
 		    <span class="tablinks">Words</span>
 		    <span class="tablinks">Logs</span>
 		  </nav>
-		</div>
+		</div>	
+		
 
 		 <!-- Settings Tab -->
 		<div id="Settings" class="tabcontent visible">
-			<h4>Filter Method</h4>
-			<select id="filterMethodSelect" name ="filter-methods">
-				<option value= 0>Censor</option>
-				<option value= 1>Substitute</option>
-				<option value= 2>Remove</option>
-			</select>
-
-			<h4> Match Method </h4>
-			<select id="matchMethodSelect" name = "match-methods"> 
-				<option value= 0>Whole Word</option>
-				<option value= 1>Per Word</option>
-			</select>
-
-			<div id="optionsCensor" class="moveDown hidden">
-			    <h4>Censor character:</h4>
-			      <select id="censorCharacterSelect" class="small" name = "censorCharacters">
-			        <option value="****">*</option>
-			        <option value="&&&&">&amp;</option>
-			        <option value="$$$$">$</option>
-			        <option value="####">#</option>
-			        <option value="@@@@">@</option>
-			        <option value="^^^^">^</option>
-			        <option value="----">-</option>
-			        <option value="____">_</option>
-			        <option value="mixed">mixed</option>
-			      </select>
+			<div style="display: inline-block;">
+				<h4>Filter Method</h4>
+				
+				<div class="dropdown">
+					<select id="filterMethodSelect" name ="filter-methods" class="setOption">
+						<option value= 0>Censor</option>
+						<option value= 1>Substitute</option>
+						<option value= 2>Remove</option>
+					</select>
+				</div>
+				
+				<h4> Match Method </h4>
+				<select id="matchMethodSelect" name = "match-methods" class="setOption"> 
+					<option value= 0>Whole Word</option>
+					<option value= 1>Per Word</option>
+				</select>
 			</div>
-			<h4> Multiple Meaning </h4>
-			<select id="multipleMean">
-				<option value= 0> Censor </option>
-				<option value= 1> Ignore </option>
-			</select>
+				<div id="optionsCensor" class="moveDown hidden">
+				    <h4>Censor character:</h4>
+				      <select id="censorCharacterSelect" class="small" name="censorCharacters" class="setOption">
+				        <option value="****">*</option>
+				        <option value="&&&&">&amp;</option>
+				        <option value="$$$$">$</option>
+				        <option value="####">#</option>
+				        <option value="@@@@">@</option>
+				        <option value="^^^^">^</option>
+				        <option value="----">-</option>
+				        <option value="____">_</option>
+				        <option value="mixed">mixed</option>
+				      </select>
+				</div>
+				<h4> Multiple Meaning </h4>
+				<select id="multipleMean" class="setOption">
+					<option value= 0> Censor </option>
+					<option value= 1> Ignore </option>
+				</select>
+			
 			<br><br>
-			<button id="btnSave">Save</button>
+			<button id="btnSave" class="myButton">Save</button>
 			<div id="saveNotif"></div>
-
+			<br><br><br><br>
 			<h4> Add/Remove Words </h4>
-			<input type="text" id="addWords" placeholder="Word">
+			<input type="text" id="addWords" placeholder="Add Word" class="setWord">
 			<select id="doubleWord">
 				<option>--Multiple Meaning--</option>
 				<option value="true">True</option>
 				<option value="false">False</option>
 			</select><br>
-			<input type="text" id="substitute" placeholder="Word Substitute"><br>
+			<div style="display: inline-block;">
+				<input type="text" id="substitute" placeholder="Word Substitute" class="setWord wordSubstitute">
+				<button id="btnAdd" class="myButton add">Add</button>
+			</div>
 			<div id="addNotif"></div>
-			<button id="btnAdd">Add</button>
 			<br><br>
-			<input type="text" id="removeWord" placeholder="Word">
-			<button id="btnRemove">Remove</button><br>
+			<input type="text" id="removeWord" placeholder="Remove Word" class="setWord">
+			<button id="btnRemove" class="myButton">Remove</button><br>
 			<div id="removeNotif"></div>
 			<br>
 			<table id="wordAndSubstitute">
@@ -74,13 +86,11 @@
 						<th>Word</th>
 						<th>Substitute</th>
 					</tr>
-					<tbody style="overflow: auto;">
-						<tr>
-							<td><div id="word"></div></td>
-							<td><div id="wordSubstitute"></div></td>
-						</tr>
-					</tbody>
 				</thead>
+				<tbody style="overflow: auto;">
+					<td><div id="word"></div></td>
+					<td><div id="wordSubstitute"></div></td>
+				</tbody>
 			</table>
 		</div>
 	
@@ -90,18 +100,18 @@
 		  <select id="domainSelect">
 		  	<option>--Choose Domain--</option>
 		  </select>
-		  <button id="domainRemove">Remove</button>
+		  <button id="domainRemove" class="myButton">Remove</button>
 		  <div class="moveDown">
 		  	<div id="notifRemove"></div>
 		    <br>
 			<div id="domainNote" class="notes">Note: To avoid the extension from not recognizing the site as a warning domain, copy and paste the link found under the ranked websites <br><br>	
 		    Example: "https://www.google.com" or "https://www.mail.google.com"</div>
 		    <input type="text" id="domainText" name="domainText" pattern="^[a-zA-Z0-9\.\-]+$">
-		    <button id="domainAdd">Add</button>
+		    <button id="domainAdd" class="myButton">Add</button>
 		    <div id="addNotif"></div>
 		    <br>
 		    <!-- Websites -->
-			 <table id="siteAndCount">
+			 <table id="siteAndCount" class="table table-bordered">
 			  	<thead>
 				  	<tr>
 				  		<th>Websites</th>
@@ -161,7 +171,8 @@
 		<!-- History Tab -->
 
 		<div id="Logs" class="tabcontent hidden">
-			<button id="clearHistory">Clear Logs</button>
+
+			<button id="clearHistory" class="myButton">Clear Logs</button>
 			<div id="notifHistory"></div>
 			<table id="history" style="table-layout:fixed; width:350px;word-break:break-all;">
 				<thead>
@@ -175,6 +186,6 @@
 		</div>
 		
 	</div>
-<script type="text/javascript" src="options.js"></script>
+<script type="text/javascript" src="assets/js/options.js"></script>
 </body>
 </html>

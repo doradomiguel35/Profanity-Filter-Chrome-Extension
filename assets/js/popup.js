@@ -1,4 +1,5 @@
 var passwordProperty;
+var newPass,confirmPass,storageNewPass,offPass,storageExPass;
 console.log("popup.js loaded");
 
 function toggleFilter(event){
@@ -10,21 +11,21 @@ function toggleFilter(event){
 				disable(document.getElementById('notification'));
 				document.getElementById('notification').checked = false;
 				var html = '<h4> Please Enter New Password </h4>';
-				html+= '<input type="password" id="newPass" placeholder="New Password"/>';
-				html+= '<input type="password" id="confirmPass" placeholder="Confirm Password"/>';
+				html+= '<input type="password" id="newPass" placeholder="New Password" class="pass"/>';
+				html+= '<input type="password" id="confirmPass" placeholder="Confirm Password" class="pass"/>';
 				html+= '<div id="loginStatus"></div>';
 				html+= '<br>';
-				html+= '<button id="storageNewPass">Set Password</button>';
+				html+= '<button id="storageNewPass" class="myButton">Set Password</button>';
 				document.getElementById('inputPassword').innerHTML = html;
 				document.getElementById('storageNewPass').addEventListener('click',setPassword);
 			}
 
 			else if(toggleFilterchecked === false){
 				var html = '<h4> Please Enter Password </h4>';
-				html+= '<input type="password" id="exPass"/>';
+				html+= '<input type="password" id="exPass" class="pass"/>';
 				html+= '<div id="loginStatus"></div>';
 				html+= '<br>';
-				html+= '<button id="offPass">Enter Password</button>';
+				html+= '<button id="offPass" class="myButton">Enter Password</button>';
 				document.getElementById('inputPassword').innerHTML = html;
 				document.getElementById('offPass').addEventListener('click',checkPassword);
 				document.getElementById('notification').checked = true;
@@ -33,10 +34,10 @@ function toggleFilter(event){
 			else if(passwordProperty != "null"){
 				disable(document.getElementById('notification'));
 				var html = '<h4> Please Enter Password </h4>';
-				html+= '<input type="password" id="exPass"/>';
+				html+= '<input type="password" id="exPass" class="pass"/>';
 				html+= '<div id="loginStatus"></div>';
 				html+= '<br>';
-				html+= '<button id="storageExPass">Enter Password</button>';
+				html+= '<button id="storageExPass" class="myButton">Enter Password</button>';
 				document.getElementById('inputPassword').innerHTML = html;
 				document.getElementById('storageExPass').addEventListener('click',checkPassword);
 				document.getElementById('notification').checked = false;
@@ -160,6 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.getElementById('options').addEventListener('click', function() {
 	var html;
+	document.getElementById('inputPassword').innerHTML="";
 	chrome.storage.local.get(['password'],function(pass){
 		if(pass.password === "null"){
 			html = '<h4> Click the toggle to set password</h4>';
@@ -168,10 +170,10 @@ document.getElementById('options').addEventListener('click', function() {
 
 		else{
 			html = '<h4> Please Enter Password </h4>';
-			html+= '<input type="password" id="passOption"/>';
+			html+= '<input type="password" id="passOption" class="pass" />';
 			html+= '<div id="loginStatus"></div>';
 			html+= '<br>';
-			html+= '<button id="optionPass">Enter Password</button>';
+			html+= '<button id="optionPass" class="myButton">Enter Password</button>';
 			html+= '<div id="optionNotif"></div>';
 			document.getElementById('optionsPassword').innerHTML = html;
 			document.getElementById('optionPass').addEventListener('click',optionPassword);
